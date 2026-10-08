@@ -1,66 +1,54 @@
 package ev.campus_dev.api.controllers;
 
 import ev.campus_dev.api.models.cliente.Cliente;
-import ev.campus_dev.api.models.usuario.Usuario;
-import ev.campus_dev.api.repositories.ClienteRepository;
-import ev.campus_dev.api.repositories.UsuarioRepository;
-import jakarta.transaction.Transactional;
+import ev.campus_dev.api.dtos.cliente_dto.ListagemCliente;
+import ev.campus_dev.api.services.ClienteService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import jakarta.validation.Valid;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.tags.Tag;
 
 @RestController
 @RequestMapping("/clientes")
+@Tag(name = "Clientes", description = "Perfis de clientes")
+@SecurityRequirement(name = "bearerAuth")
 public class ClienteController {
 
     @Autowired
-    private ClienteRepository clienteRepository;
-
-    @Autowired
-    private UsuarioRepository usuarioRepository;
+    private ClienteService clienteService;
 
     @GetMapping
-    public ResponseEntity<List<Cliente>> listar() {
-        return ResponseEntity.ok(clienteRepository.findAll());
+    @Operation(summary = "Listar clientes")
+    public ResponseEntity<List<ListagemCliente>> listar() {
+        return ResponseEntity.ok(clienteService.listar());
     }
 
     @PostMapping
-    @Transactional
-    public ResponseEntity<Cliente> cadastrar(@RequestBody Cliente cliente) {
-        Usuario usuario = cliente.getUsuario();
-        usuario.setRole("CLIENTE");
-        usuario.setDataCadastro(LocalDateTime.now());
-        usuarioRepository.save(usuario);
-
-        Cliente salvo = clienteRepository.save(cliente);
+    @Operation(summary = "Cadastrar cliente")
+    public ResponseEntity<Cliente> cadastrar(@RequestBody @Valid Cliente cliente) {
+        Cliente salvo = clienteService.cadastrar(cliente);
         return ResponseEntity.status(201).body(salvo);
     }
 
     @PutMapping("/{id}")
-    @Transactional
+    @Operation(summary = "Atualizar cliente")
     public ResponseEntity<Cliente> atualizar(@PathVariable Long id, @RequestBody Cliente cliente) {
-        return clienteRepository.findById(id)
-                .map(existente -> {
-                    existente.setTipoDeMercado(cliente.getTipoDeMercado());
-                    existente.setNomeEmpresa(cliente.getNomeEmpresa());
-                    existente.setTelefone(cliente.getTelefone());
-                    Cliente atualizado = clienteRepository.save(existente);
-                    return ResponseEntity.ok(atualizado);
-                })
+        return clienteService.atualizar(id, cliente)
+                .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }
 
     @DeleteMapping("/{id}")
-    @Transactional
+    @Operation(summary = "Excluir cliente")
     public ResponseEntity<Void> deletar(@PathVariable Long id) {
-        return clienteRepository.findById(id)
-                .map(cliente -> {
-                    clienteRepository.delete(cliente);
-                    return ResponseEntity.noContent().<Void>build();
-                })
-                .orElse(ResponseEntity.notFound().build());
+        return clienteService.deletar(id)
+                ? ResponseEntity.noContent().build()
+                : ResponseEntity.notFound().build();
     }
 }

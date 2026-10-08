@@ -10,9 +10,10 @@ import { Alert, AlertDescription } from '@/components/ui/alert'
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Plus, Users, Calendar, Code, Search, Filter, AlertCircle, CheckCircle } from 'lucide-react'
+import { apiFetch } from '@/api/client'
 
 const Projects = ({ user, token }) => {
-  const [searchParams, setSearchParams] = useSearchParams()
+  const [searchParams] = useSearchParams()
   const [projects, setProjects] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
@@ -41,7 +42,7 @@ const Projects = ({ user, token }) => {
 
   const fetchProjects = async () => {
     try {
-      const response = await fetch('/api/projects')
+      const response = await apiFetch('/projetos')
 
       if (response.ok) {
         const data = await response.json()
@@ -49,7 +50,7 @@ const Projects = ({ user, token }) => {
       } else {
         setError('Erro ao carregar projetos')
       }
-    } catch (err) {
+    } catch {
       setError('Erro de conexão')
     } finally {
       setLoading(false)
@@ -70,16 +71,18 @@ const Projects = ({ user, token }) => {
     try {
       const projectData = {
         ...newProject,
-        linguagemTecnologia: newProject.linguagemTecnologia.split(',').map(tech => tech.trim()),
-        tamanhoEquipe: parseInt(newProject.tamanhoEquipe),
-        prazoEntrega: newProject.prazoEntrega || null
+        linguagemTecnologia: newProject.linguagemTecnologia,
+        qndPessoasNecessarias: parseInt(newProject.tamanhoEquipe),
+        status: 'ABERTO',
+        prazoEntrega: newProject.prazoEntrega
+          ? `${newProject.prazoEntrega}T00:00:00`
+          : null
       }
 
-      const response = await fetch('/api/projects', {
+      const response = await apiFetch(`/projetos/${user.id}`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`,
         },
         body: JSON.stringify(projectData),
       })
@@ -99,7 +102,7 @@ const Projects = ({ user, token }) => {
       } else {
         setCreateError(data.error || 'Erro ao criar projeto')
       }
-    } catch (err) {
+    } catch {
       setCreateError('Erro de conexão')
     } finally {
       setCreateLoading(false)
@@ -113,7 +116,7 @@ const Projects = ({ user, token }) => {
     }
 
     try {
-      const response = await fetch(`/api/projects/${projectId}/join`, {
+      const response = await apiFetch(`/candidaturas/projetos/${projectId}/desenvolvedores/${user.id}`, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -128,7 +131,7 @@ const Projects = ({ user, token }) => {
       } else {
         alert(data.error || 'Erro ao entrar no projeto')
       }
-    } catch (err) {
+    } catch {
       alert('Erro de conexão')
     }
   }
@@ -144,13 +147,13 @@ const Projects = ({ user, token }) => {
 
   const getStatusColor = (status) => {
     switch (status) {
-      case 'Em aberto':
+      case 'ABERTO':
         return 'bg-green-100 text-green-800'
-      case 'Em andamento':
+      case 'EM_ANDAMENTO':
         return 'bg-blue-100 text-blue-800'
-      case 'Finalizado':
+      case 'FINALIZADO':
         return 'bg-gray-100 text-gray-800'
-      case 'Cancelado':
+      case 'CANCELADO':
         return 'bg-red-100 text-red-800'
       default:
         return 'bg-gray-100 text-gray-800'
@@ -159,14 +162,12 @@ const Projects = ({ user, token }) => {
 
   const canJoinProject = (project) => {
     if (!user) return false
-    if (project.status !== 'Em aberto') return false
-    if (project.participantes.length >= project.tamanhoEquipe) return false
-    if (project.participantes.some(p => p.idUsuario === user.idUsuario)) return false
+    if (project.status !== 'ABERTO') return false
     return true
   }
 
-  const isUserInProject = (project) => {
-    return user && project.participantes.some(p => p.idUsuario === user.idUsuario)
+  const isUserInProject = () => {
+    return false
   }
 
   if (loading) {
@@ -307,10 +308,10 @@ const Projects = ({ user, token }) => {
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="all">Todos os status</SelectItem>
-            <SelectItem value="Em aberto">Em aberto</SelectItem>
-            <SelectItem value="Em andamento">Em andamento</SelectItem>
-            <SelectItem value="Finalizado">Finalizado</SelectItem>
-            <SelectItem value="Cancelado">Cancelado</SelectItem>
+            <SelectItem value="ABERTO">Aberto</SelectItem>
+            <SelectItem value="EM_ANDAMENTO">Em andamento</SelectItem>
+            <SelectItem value="FINALIZADO">Finalizado</SelectItem>
+            <SelectItem value="CANCELADO">Cancelado</SelectItem>
           </SelectContent>
         </Select>
       </div>

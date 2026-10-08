@@ -8,8 +8,9 @@ import { Badge } from '@/components/ui/badge'
 import { Alert, AlertDescription } from '@/components/ui/alert'
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
 import { User, Mail, BookOpen, Code, Plus, X, Save, Trash2, AlertCircle, CheckCircle } from 'lucide-react'
+import { apiFetch } from '@/api/client'
 
-const Profile = ({ user, token }) => {
+const Profile = ({ user }) => {
   const navigate = useNavigate()
   const [profileData, setProfileData] = useState({
     nomeCompleto: user?.nomeCompleto || '',
@@ -67,13 +68,16 @@ const Profile = ({ user, token }) => {
     setSuccess('')
 
     try {
-      const response = await fetch('/api/user/profile', {
+      const response = await apiFetch(`/usuarios/${user.id}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`,
         },
-        body: JSON.stringify(profileData),
+        body: JSON.stringify({
+          nomeCompleto: profileData.nomeCompleto,
+          email: user.email,
+          role: user.role,
+        }),
       })
 
       const data = await response.json()
@@ -90,7 +94,7 @@ const Profile = ({ user, token }) => {
       } else {
         setError(data.error || 'Erro ao atualizar perfil')
       }
-    } catch (err) {
+    } catch {
       setError('Erro de conexão')
     } finally {
       setLoading(false)
@@ -102,14 +106,9 @@ const Profile = ({ user, token }) => {
     setError('')
 
     try {
-      const response = await fetch('/api/user/delete', {
+      const response = await apiFetch(`/usuarios/${user.id}`, {
         method: 'DELETE',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-        },
       })
-
-      const data = await response.json()
 
       if (response.ok) {
         // Limpar dados do localStorage
@@ -118,11 +117,10 @@ const Profile = ({ user, token }) => {
 
         // Redirecionar para página inicial
         navigate('/')
-        alert('Conta excluída com sucesso!')
       } else {
-        setError(data.error || 'Erro ao excluir conta')
+        setError('Erro ao excluir conta')
       }
-    } catch (err) {
+    } catch {
       setError('Erro de conexão')
     } finally {
       setDeleteLoading(false)
@@ -184,7 +182,7 @@ const Profile = ({ user, token }) => {
                   <Label htmlFor="emailUniversitario">Email Universitário</Label>
                   <Input
                     id="emailUniversitario"
-                    value={user?.emailUniversitario || ''}
+                    value={user?.email || ''}
                     disabled
                     className="bg-gray-50"
                   />
@@ -297,7 +295,7 @@ const Profile = ({ user, token }) => {
                   <Mail className="h-5 w-5 text-green-600" />
                 </div>
                 <div className="min-w-0 flex-1">
-                  <p className="font-medium break-all text-sm">{user?.emailUniversitario}</p>
+                  <p className="font-medium break-all text-sm">{user?.email}</p>
                   <p className="text-sm text-gray-500">Email</p>
                 </div>
               </div>

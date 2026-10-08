@@ -7,11 +7,12 @@ import { Label } from '@/components/ui/label'
 import { Alert, AlertDescription } from '@/components/ui/alert'
 import { Checkbox } from '@/components/ui/checkbox'
 import { Code, User, Mail, Lock, AlertCircle, CheckCircle } from 'lucide-react'
+import { apiFetch } from '@/api/client'
 
 const Register = () => {
   const [formData, setFormData] = useState({
     nomeCompleto: '',
-    emailUniversitario: '',
+    email: '',
     senha: '',
     confirmarSenha: '',
     aceitarTermos: false
@@ -35,14 +36,14 @@ const Register = () => {
       return false
     }
 
-    if (!formData.emailUniversitario.trim()) {
+    if (!formData.email.trim()) {
       setError('Email universitário é obrigatório')
       return false
     }
 
     // Validar email universitário
     const emailPattern = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.(edu\.br|edu)$/
-    if (!emailPattern.test(formData.emailUniversitario)) {
+    if (!emailPattern.test(formData.email)) {
       setError('Email deve ser de uma universidade (.edu.br ou .edu)')
       return false
     }
@@ -76,14 +77,14 @@ const Register = () => {
     }
 
     try {
-      const response = await fetch('/api/register', {
+      const response = await apiFetch('/api/register', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
           nomeCompleto: formData.nomeCompleto,
-          emailUniversitario: formData.emailUniversitario,
+          email: formData.email,
           senha: formData.senha
         }),
       })
@@ -98,7 +99,7 @@ const Register = () => {
       } else {
         setError(data.error || 'Erro ao criar conta')
       }
-    } catch (err) {
+    } catch {
       setError('Erro de conexão. Tente novamente.')
     } finally {
       setLoading(false)
@@ -183,17 +184,17 @@ const Register = () => {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="emailUniversitario">Email Universitário</Label>
+                <Label htmlFor="email">Email Universitário</Label>
                 <div className="relative">
                   <Mail className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
                   <Input
-                    id="emailUniversitario"
-                    name="emailUniversitario"
+                    id="email"
+                    name="email"
                     type="email"
                     required
                     className="pl-10"
                     placeholder="seu.email@universidade.edu.br"
-                    value={formData.emailUniversitario}
+                    value={formData.email}
                     onChange={handleChange}
                   />
                 </div>

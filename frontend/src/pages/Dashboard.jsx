@@ -4,8 +4,9 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Plus, Users, Clock, CheckCircle, AlertCircle } from 'lucide-react'
+import { apiFetch } from '@/api/client'
 
-const Dashboard = ({ user, token }) => {
+const Dashboard = ({ user }) => {
   const [projects, setProjects] = useState({ projetosCriados: [], projetosParticipando: [] })
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
@@ -16,19 +17,20 @@ const Dashboard = ({ user, token }) => {
 
   const fetchUserProjects = async () => {
     try {
-      const response = await fetch('/api/users/dashboard', {
-        headers: {
-          'Authorization': `Bearer ${token}`,
-        },
-      })
+      const response = await apiFetch('/projetos')
 
       if (response.ok) {
         const data = await response.json()
-        setProjects(data)
+        setProjects({
+          projetosCriados: [],
+          projetosParticipando: [],
+          projetosDisponiveis: data,
+          estatisticas: { totalCriados: 0, totalParticipando: 0, totalProjetos: data.length },
+        })
       } else {
         setError('Erro ao carregar projetos')
       }
-    } catch (err) {
+    } catch {
       setError('Erro de conexão')
     } finally {
       setLoading(false)

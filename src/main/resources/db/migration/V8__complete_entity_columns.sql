@@ -1,0 +1,3 @@
+ALTER TABLE clientes
+    ADD COLUMN IF NOT EXISTS nome_empresa VARCHAR(150),
+    ADD COLUMN IF NOT EXISTS telefone VARCHAR(30);

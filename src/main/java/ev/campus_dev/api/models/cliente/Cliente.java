@@ -3,7 +3,6 @@ package ev.campus_dev.api.models.cliente;
 import ev.campus_dev.api.dtos.cliente_dto.AtualizacaoCliente;
 import ev.campus_dev.api.dtos.cliente_dto.CadastroCliente;
 import ev.campus_dev.api.dtos.cliente_dto.ListagemCliente;
-import ev.campus_dev.api.models.usuario.Usuario;
 import jakarta.persistence.*;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -17,17 +16,13 @@ import java.time.LocalDateTime;
 @Getter
 @Setter
 
-public class Cliente {
-
-    @Id
-    private Long id;
-    @OneToOne
-    @MapsId
-    @JoinColumn(name = "id_usuario", referencedColumnName = "id_usuario")
-    private Usuario usuario;
+public class Cliente extends ev.campus_dev.api.models.usuario.Usuario {
+    @Column(name = "tipo_de_mercado")
     private String tipoDeMercado;
+    @Column(name = "nome_empresa")
     private String nomeEmpresa;
     private String telefone;
+    @Column(name = "data_cadastro")
     private LocalDateTime dataDeCadastro;
 
     public void atualizarDados(AtualizacaoCliente dados) {

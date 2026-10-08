@@ -11,6 +11,6 @@ public record ListagemDesenvolvedor(
 
 ) {
     public ListagemDesenvolvedor(Desenvolvedor desenvolvedor) {
-        this(desenvolvedor.getUsuario().getNomeCompleto(), desenvolvedor.getUsuario().getEmail(), desenvolvedor.getCurso(), desenvolvedor.getSkills());
+        this(desenvolvedor.getNomeCompleto(), desenvolvedor.getEmail(), desenvolvedor.getCurso(), desenvolvedor.getSkills());
     }
 }

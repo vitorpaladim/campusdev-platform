@@ -5,7 +5,7 @@ import java.util.Set;
 import ev.campus_dev.api.models.desenvolvedor.Desenvolvedor;
 import ev.campus_dev.api.dtos.projetos_dto.AtualizacaoProjeto;
 import ev.campus_dev.api.dtos.projetos_dto.CadastroProjeto;
-import ev.campus_dev.api.models.usuario.Usuario;
+import ev.campus_dev.api.models.cliente.Cliente;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -26,20 +26,27 @@ public class Projeto {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
 
+    @Column(name = "id_projeto")
     private Long id_projeto;
+    @Column(nullable = false, length = 150)
     private String titulo;
     private String descricao;
+    @Column(name = "linguagem_tecnologia")
     private String linguagemTecnologia;
+    @Column(name = "qnd_pessoas_necessarias")
     private int qndPessoasNecessarias;
     private String status;
+    @Column(name = "data_cadastro")
     private LocalDateTime dataDeCadastro;
-    private String prazoEntrega;
+    @Column(name = "prazo_entrega")
+    private LocalDateTime prazoEntrega;
+    @Column(name = "link_convite")
     private String linkConvite;
 
     // relacionamento com cliente (quem pede)
     @ManyToOne
     @JoinColumn(name = "cliente_id")
-    private Usuario cliente;
+    private Cliente cliente;
 
 //    // relacionamento com desenvolvedor (quem executa)
 //    @ManyToOne
@@ -55,7 +62,14 @@ public class Projeto {
     private Set<Desenvolvedor> desenvolvedores = new HashSet<>();
 
     public Projeto(CadastroProjeto dados) {
-        //construtor (se precisar)
+        this.titulo = dados.titulo();
+        this.descricao = dados.descricao();
+        this.linguagemTecnologia = dados.linguagemTecnologia();
+        this.qndPessoasNecessarias = dados.qndPessoasNecessarias();
+        this.status = dados.status() == null ? "ABERTO" : dados.status();
+        this.dataDeCadastro = dados.dataDeCadastro() == null ? LocalDateTime.now() : dados.dataDeCadastro();
+        this.prazoEntrega = dados.prazoEntrega();
+        this.linkConvite = dados.linkConvite();
     }
 
 

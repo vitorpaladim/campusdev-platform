@@ -20,11 +20,25 @@ function App() {
     const savedUser = localStorage.getItem('user')
 
     if (savedToken && savedUser) {
-      setToken(savedToken)
-      setUser(JSON.parse(savedUser))
+      try {
+        setToken(savedToken)
+        setUser(JSON.parse(savedUser))
+      } catch {
+        localStorage.removeItem('token')
+        localStorage.removeItem('user')
+      }
     }
 
     setLoading(false)
+  }, [])
+
+  useEffect(() => {
+    const handleExpiredSession = () => {
+      setUser(null)
+      setToken(null)
+    }
+    window.addEventListener('auth:expired', handleExpiredSession)
+    return () => window.removeEventListener('auth:expired', handleExpiredSession)
   }, [])
 
   const handleLogin = (userData, userToken) => {

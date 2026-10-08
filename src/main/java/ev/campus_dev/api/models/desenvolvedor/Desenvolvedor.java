@@ -5,7 +5,6 @@ import java.util.Set;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import ev.campus_dev.api.models.projeto.Projeto;
 import ev.campus_dev.api.dtos.desenvolvedor_dto.AtualizacaoDesenvolvedor;
-import ev.campus_dev.api.models.usuario.Usuario;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -15,25 +14,19 @@ import java.util.Set;
 
 @Table(name = "desenvolvedores")
 @Entity(name = "Desenvolvedor")
+@PrimaryKeyJoinColumn(name = "id")
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(of = "id")
-public class Desenvolvedor {
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+public class Desenvolvedor extends ev.campus_dev.api.models.usuario.Usuario {
 
     private String curso;
     private String semestre;
     private String skills;
+    @Column(name = "data_cadastro")
     private LocalDateTime dataDeCadastro;
-
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "usuario_id", referencedColumnName = "id")
-    private Usuario usuario;
 
     @ManyToMany(mappedBy = "desenvolvedores", fetch = FetchType.LAZY)
     @JsonIgnore
@@ -41,6 +34,12 @@ public class Desenvolvedor {
 
 
     public void atualizarDesenvolvedor(AtualizacaoDesenvolvedor dados) {
+        if (dados.nomeCompleto() != null) {
+            setNomeCompleto(dados.nomeCompleto());
+        }
+        if (dados.email() != null) {
+            setEmail(dados.email());
+        }
         if (dados.curso() != null) {
             this.curso = dados.curso();
         }

@@ -19,11 +19,18 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 
 import java.time.LocalDateTime;
 
 @RestController
 @RequestMapping("/api")
+@Tag(name = "Autenticação", description = "Login e registro de usuários")
 public class AuthenticationController {
 
     @Autowired
@@ -42,6 +49,12 @@ public class AuthenticationController {
     private PasswordEncoder passwordEncoder;
 
     @PostMapping("/login")
+    @Operation(summary = "Autenticar usuário", description = "Valida email e senha e retorna um JWT.")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Login realizado"),
+            @ApiResponse(responseCode = "400", description = "Dados inválidos"),
+            @ApiResponse(responseCode = "401", description = "Credenciais inválidas")
+    })
     public ResponseEntity efetuarLogin(@RequestBody @Valid DadosAutenticacao dados) {
         // 1. Recebe os dados de login (email e senha)
         var authenticationToken = new UsernamePasswordAuthenticationToken(dados.email(), dados.senha());
@@ -53,10 +66,15 @@ public class AuthenticationController {
         var tokenJWT = tokenService.gerarToken((Usuario) authentication.getPrincipal());
 
         // 4. Retorna o token para o frontend
-        return ResponseEntity.ok(new DadosTokenJWT(tokenJWT));
+        return ResponseEntity.ok(new DadosTokenJWT(tokenJWT, (Usuario) authentication.getPrincipal()));
     }
 
     @PostMapping("/register")
+    @Operation(summary = "Registrar desenvolvedor", description = "Cria um usuário desenvolvedor e seu perfil.")
+    @ApiResponses({
+            @ApiResponse(responseCode = "201", description = "Usuário criado"),
+            @ApiResponse(responseCode = "400", description = "Dados inválidos ou email já cadastrado")
+    })
     @Transactional
     public ResponseEntity efetuarCadastro(@RequestBody @Valid CadastroDesenvolvedor dados) {
         // 1. Verifica se o email já existe no banco de dados
@@ -65,17 +83,12 @@ public class AuthenticationController {
         }
 
         // 2. Cria e salva a entidade base Usuario
-        Usuario novoUsuario = new Usuario();
-        novoUsuario.setNomeCompleto(dados.nomeCompleto());
-        novoUsuario.setEmail(dados.email());
-        novoUsuario.setSenha(passwordEncoder.encode(dados.senha())); // CRIPTOGRAFA a senha!
-        novoUsuario.setRole("DEV"); // Por padrão, todo novo registro é um Desenvolvedor
-        novoUsuario.setDataCadastro(LocalDateTime.now());
-        usuarioRepository.save(novoUsuario);
-
-        // 3. Cria e salva a entidade específica Desenvolvedor, ligada ao usuário
         Desenvolvedor novoDev = new Desenvolvedor();
-        novoDev.setUsuario(novoUsuario);
+        novoDev.setNomeCompleto(dados.nomeCompleto());
+        novoDev.setEmail(dados.email());
+        novoDev.setSenha(passwordEncoder.encode(dados.senha()));
+        novoDev.setRole("DEV");
+        novoDev.setDataCadastro(LocalDateTime.now());
         novoDev.setCurso(dados.curso()); // Pode ser nulo
         novoDev.setSemestre(dados.semestre()); // Pode ser nulo
         novoDev.setSkills(dados.skills()); // Pode ser nulo

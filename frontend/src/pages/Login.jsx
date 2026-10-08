@@ -5,11 +5,12 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Alert, AlertDescription } from '@/components/ui/alert'
+import { apiFetch } from '@/api/client'
 import { Code, Mail, Lock, AlertCircle } from 'lucide-react'
 
 const Login = ({ onLogin }) => {
   const [formData, setFormData] = useState({
-    emailUniversitario: '',
+    email: '',
     senha: ''
   })
   const [loading, setLoading] = useState(false)
@@ -29,7 +30,7 @@ const Login = ({ onLogin }) => {
     setError('')
 
     try {
-      const response = await fetch('/api/login', {
+      const response = await apiFetch('/api/login', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -41,18 +42,18 @@ const Login = ({ onLogin }) => {
 
       if (response.ok) {
         // Salvar token no localStorage
-        localStorage.setItem('token', data.access_token)
+        localStorage.setItem('token', data.token)
         localStorage.setItem('user', JSON.stringify(data.usuario))
 
         // Chamar callback de login
-        onLogin(data.usuario, data.access_token)
+        onLogin(data.usuario, data.token)
 
         // Redirecionar para dashboard
         navigate('/dashboard')
       } else {
         setError(data.error || 'Erro ao fazer login')
       }
-    } catch (err) {
+    } catch {
       setError('Erro de conexão. Tente novamente.')
     } finally {
       setLoading(false)
@@ -95,17 +96,17 @@ const Login = ({ onLogin }) => {
               )}
 
               <div className="space-y-2">
-                <Label htmlFor="emailUniversitario">Email Universitário</Label>
+                <Label htmlFor="email">Email Universitário</Label>
                 <div className="relative">
                   <Mail className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
                   <Input
-                    id="emailUniversitario"
-                    name="emailUniversitario"
+                    id="email"
+                    name="email"
                     type="email"
                     required
                     className="pl-10"
                     placeholder="seu.email@universidade.edu.br"
-                    value={formData.emailUniversitario}
+                    value={formData.email}
                     onChange={handleChange}
                   />
                 </div>

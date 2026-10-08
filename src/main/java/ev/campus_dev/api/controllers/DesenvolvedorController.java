@@ -7,90 +7,61 @@ import java.util.Optional;
 import ev.campus_dev.api.dtos.desenvolvedor_dto.ListagemDesenvolvedor;
 import ev.campus_dev.api.dtos.desenvolvedor_dto.AtualizacaoDesenvolvedor;
 import ev.campus_dev.api.dtos.desenvolvedor_dto.CadastroDesenvolvedor;
-import ev.campus_dev.api.models.usuario.Usuario;
-import ev.campus_dev.api.models.desenvolvedor.Desenvolvedor;
-import ev.campus_dev.api.repositories.UsuarioRepository;
-import ev.campus_dev.api.repositories.DesenvolvedorRepository;
-import jakarta.transaction.Transactional;
+import ev.campus_dev.api.services.DesenvolvedorService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.tags.Tag;
 
 
 @RestController
 @RequestMapping("/desenvolvedores")
+@Tag(name = "Desenvolvedores", description = "Perfis de desenvolvedores")
+@SecurityRequirement(name = "bearerAuth")
 public class DesenvolvedorController {
 
     @Autowired
-    private DesenvolvedorRepository desenvolvedorRepository;
-
-    @Autowired
-    private UsuarioRepository usuarioRepository;
+    private DesenvolvedorService desenvolvedorService;
 
     // Criar Desenvolvedor
     @PostMapping
-    @Transactional
+    @Operation(summary = "Cadastrar desenvolvedor")
     public ResponseEntity<ListagemDesenvolvedor> cadastrar(@RequestBody @Valid CadastroDesenvolvedor dados) {
-        Usuario usuario = new Usuario();
-        usuario.setNomeCompleto(dados.nomeCompleto());
-        usuario.setEmail(dados.email());
-        usuario.setSenha(dados.senha());
-        usuario.setRole("DEV");
-        usuario.setDataCadastro(LocalDateTime.now());
-
-        usuarioRepository.save(usuario);
-
-        Desenvolvedor dev = new Desenvolvedor();
-        dev.setUsuario(usuario);
-        dev.setCurso(dados.curso());
-        dev.setSemestre(dados.semestre());
-        dev.setSkills(dados.skills());
-        desenvolvedorRepository.save(dev);
-
-        return ResponseEntity.status(201).body(new ListagemDesenvolvedor(dev));
+        return ResponseEntity.status(201).body(desenvolvedorService.cadastrar(dados));
     }
 
     // Listar todos os desenvolvedores
     @GetMapping
+    @Operation(summary = "Listar desenvolvedores")
     public ResponseEntity<List<ListagemDesenvolvedor>> listar() {
-        var lista = desenvolvedorRepository.findAll()
-                .stream()
-                .map(ListagemDesenvolvedor::new)
-                .toList();
-
-        return ResponseEntity.ok(lista);
+        return ResponseEntity.ok(desenvolvedorService.listar());
     }
 
     // Buscar por ID
     @GetMapping("/{id}")
+    @Operation(summary = "Consultar desenvolvedor")
     public ResponseEntity<ListagemDesenvolvedor> buscar(@PathVariable Long id) {
-        Optional<Desenvolvedor> desenvolvedorOptional = desenvolvedorRepository.findById(id);
-        return desenvolvedorOptional.map(desenvolvedor -> ResponseEntity.ok(new ListagemDesenvolvedor(desenvolvedor)))
+        return desenvolvedorService.buscar(id)
+                .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }
 
     // Atualizar desenvolvedor
     @PutMapping("/{id}")
-    @Transactional
+    @Operation(summary = "Atualizar desenvolvedor")
     public ResponseEntity<ListagemDesenvolvedor> atualizar(@PathVariable Long id, @RequestBody AtualizacaoDesenvolvedor dados) {
-        return desenvolvedorRepository.findById(id)
-                .map(dev -> {
-                    dev.atualizarDesenvolvedor(dados);
-                    Desenvolvedor devAtualizado = desenvolvedorRepository.save(dev);
-                    return ResponseEntity.ok(new ListagemDesenvolvedor(devAtualizado));
-                })
+        return desenvolvedorService.atualizar(id, dados)
+                .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }
 
     @DeleteMapping("/{id}")
-    @Transactional
+    @Operation(summary = "Excluir desenvolvedor")
     public ResponseEntity<Void> deletar(@PathVariable Long id) {
-        return desenvolvedorRepository.findById(id)
-                .map(dev -> {
-                    usuarioRepository.delete(dev.getUsuario());
-                    desenvolvedorRepository.delete(dev);
-                    return ResponseEntity.noContent().<Void>build();
-                })
-                .orElseGet(() -> ResponseEntity.notFound().build());
+        return desenvolvedorService.deletar(id)
+                ? ResponseEntity.noContent().build()
+                : ResponseEntity.notFound().build();
     }
 }

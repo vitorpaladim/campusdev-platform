@@ -1,59 +1,53 @@
 package ev.campus_dev.api.controllers;
 
 import ev.campus_dev.api.models.usuario.Usuario;
-import ev.campus_dev.api.repositories.UsuarioRepository;
-import jakarta.transaction.Transactional;
+import ev.campus_dev.api.services.UsuarioService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import jakarta.validation.Valid;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.tags.Tag;
 
 @RestController
 @RequestMapping("/usuarios")
+@Tag(name = "Usuários", description = "Operações administrativas de usuários")
+@SecurityRequirement(name = "bearerAuth")
 public class UsuarioController {
 
     @Autowired
-    private UsuarioRepository usuarioRepository;
+    private UsuarioService usuarioService;
 
     @GetMapping
+    @Operation(summary = "Listar usuários")
     public ResponseEntity<List<Usuario>> listar() {
-        return ResponseEntity.ok(usuarioRepository.findAll());
+        return ResponseEntity.ok(usuarioService.listar());
     }
 
     @PostMapping
-    @Transactional
-    public ResponseEntity<Usuario> criar(@RequestBody Usuario usuario) {
-        usuario.setDataCadastro(LocalDateTime.now());
-
-        Usuario salvo = usuarioRepository.save(usuario);
+    @Operation(summary = "Criar usuário")
+    public ResponseEntity<Usuario> criar(@RequestBody @Valid Usuario usuario) {
+        Usuario salvo = usuarioService.criar(usuario);
         return ResponseEntity.status(201).body(salvo);
     }
 
     @PutMapping("/{id}")
-    @Transactional
+    @Operation(summary = "Atualizar usuário")
     public ResponseEntity<Usuario> atualizar(@PathVariable Long id, @RequestBody Usuario usuario) {
-        return usuarioRepository.findById(id)
-                .map(existente -> {
-                    existente.setNomeCompleto(usuario.getNomeCompleto());
-                    existente.setEmail(usuario.getEmail());
-                    existente.setSenha(usuario.getSenha());
-                    existente.setRole(usuario.getRole());
-                    Usuario atualizado = usuarioRepository.save(existente);
-                    return ResponseEntity.ok(atualizado);
-                })
+        return usuarioService.atualizar(id, usuario)
+                .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }
 
     @DeleteMapping("/{id}")
-    @Transactional
+    @Operation(summary = "Excluir usuário")
     public ResponseEntity<Void> deletar(@PathVariable Long id) {
-        return usuarioRepository.findById(id)
-                .map(usuario -> {
-                    usuarioRepository.delete(usuario);
-                    return ResponseEntity.noContent().<Void>build();
-                })
-                .orElse(ResponseEntity.notFound().build());
+        return usuarioService.deletar(id)
+                ? ResponseEntity.noContent().build()
+                : ResponseEntity.notFound().build();
     }
 }
