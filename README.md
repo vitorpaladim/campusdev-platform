@@ -14,16 +14,25 @@ tratamento global de erros e migrations versionadas. O frontend está em
 Configure as variáveis:
 
 ```text
-DB_USERNAME=usuario_do_mysql
-DB_PASSWORD=senha_do_mysql
+DB_USERNAME=usuario_do_postgresql
+DB_PASSWORD=senha_do_postgresql
 DB_URL=jdbc:postgresql://localhost:5432/campus_dev
 JWT_SECRET=uma_chave_secreta_forte
 ```
 
-Backend:
+No PowerShell do Windows, por exemplo:
+
+```powershell
+$env:DB_USERNAME="postgres"
+$env:DB_PASSWORD="sua-senha"
+$env:DB_URL="jdbc:postgresql://localhost:5432/campus_dev"
+$env:JWT_SECRET="uma-chave-secreta-com-pelo-menos-32-caracteres"
+```
+
+Backend (Java 17 no ambiente atual):
 
 ```bash
-./mvnw spring-boot:run
+./mvnw.cmd -Dmaven.compiler.release=17 spring-boot:run
 ```
 
 Banco:
