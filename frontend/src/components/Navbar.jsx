@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
+import { Link, NavLink, useNavigate } from 'react-router-dom'
 import { Button } from '@/components/ui/button'
 import { Menu, X, Code, LogOut, User } from 'lucide-react'
 
@@ -13,13 +13,13 @@ const Navbar = ({ user, onLogout }) => {
   }
 
   return (
-    <nav className="bg-white shadow-lg border-b">
+    <nav className="site-nav">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between h-16">
           <div className="flex items-center">
             <Link to="/" className="flex items-center space-x-2">
-              <Code className="h-8 w-8 text-blue-600" />
-              <span className="text-xl font-bold text-gray-900">CampusDevs</span>
+              <span className="brand-mark"><Code className="h-5 w-5" /></span>
+              <span className="brand-name">Campus<span>Dev</span></span>
             </Link>
           </div>
 
@@ -27,18 +27,11 @@ const Navbar = ({ user, onLogout }) => {
           <div className="hidden md:flex items-center space-x-4">
             {user ? (
               <>
-                <Link to="/dashboard">
-                  <Button variant="ghost">Dashboard</Button>
-                </Link>
-                <Link to="/projects">
-                  <Button variant="ghost">Projetos</Button>
-                </Link>
-                <Link to="/profile">
-                  <Button variant="ghost" className="flex items-center space-x-1">
-                    <User className="h-4 w-4" />
-                    <span>{user.nomeCompleto}</span>
-                  </Button>
-                </Link>
+                <NavLink to="/dashboard" className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`}>Visão geral</NavLink>
+                <NavLink to="/projects" className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`}>Projetos</NavLink>
+                <NavLink to="/profile" className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`}>
+                  <User className="h-4 w-4" /> {user.nomeCompleto?.split(' ')[0]}
+                </NavLink>
                 <Button onClick={handleLogout} variant="outline" className="flex items-center space-x-1">
                   <LogOut className="h-4 w-4" />
                   <span>Sair</span>
@@ -46,12 +39,8 @@ const Navbar = ({ user, onLogout }) => {
               </>
             ) : (
               <>
-                <Link to="/login">
-                  <Button variant="ghost">Entrar</Button>
-                </Link>
-                <Link to="/register">
-                  <Button>Cadastrar</Button>
-                </Link>
+                <Link to="/login" className="nav-link">Entrar</Link>
+                <Link to="/register" className="nav-cta">Criar conta <span>↗</span></Link>
               </>
             )}
           </div>

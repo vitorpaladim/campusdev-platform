@@ -1,256 +1,83 @@
-import React from 'react';
-import { Link } from 'react-router-dom';
-import { ArrowRight, Users, Code, Trophy, Star, CheckCircle, Search, Briefcase, GraduationCap } from 'lucide-react';
+import { Link } from 'react-router-dom'
+import { ArrowUpRight, Check, Code2, Layers3, MoveRight, Sparkles, UsersRound } from 'lucide-react'
 
-const LandingPage = () => {
-  return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-indigo-50">
-      {/* Hero Section */}
-      <section className="relative overflow-hidden bg-white">
-        <div className="absolute inset-0 bg-gradient-to-r from-blue-600/5 to-indigo-600/5"></div>
-        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
-          <div className="text-center">
-            <div className="flex justify-center mb-8">
-              <div className="bg-gradient-to-r from-blue-600 to-indigo-600 text-white p-4 rounded-2xl">
-                <Code className="w-12 h-12" />
-              </div>
-            </div>
+const steps = [
+  ['01', 'Monte seu perfil', 'Mostre suas habilidades, interesses e o tipo de desafio que procura.'],
+  ['02', 'Encontre uma frente', 'Explore projetos com contexto, escopo e espaço para contribuir.'],
+  ['03', 'Construa junto', 'Aprenda fazendo e transforme cada entrega em experiência real.'],
+]
 
-            <h1 className="text-5xl md:text-6xl font-bold text-gray-900 mb-6 leading-tight">
-              Conecte-se com
-              <span className="bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent"> Projetos Reais</span>
-            </h1>
-
-            <p className="text-xl text-gray-600 mb-12 max-w-3xl mx-auto leading-relaxed">
-              A plataforma que conecta estudantes universitários a projetos colaborativos reais.
-              Desenvolva suas habilidades, construa seu portfólio e ganhe experiência prática.
-            </p>
-
-            {/* Main Action Cards */}
-            <div className="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto mb-16">
-              {/* Student Card - ativo */}
-              <div className="group relative bg-white rounded-3xl p-8 shadow-xl border-2 border-blue-100 hover:border-blue-300 transition-all duration-300 hover:shadow-2xl hover:-translate-y-2">
-                <div className="absolute inset-0 bg-gradient-to-br from-blue-600/5 to-indigo-600/5 rounded-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-                <div className="relative">
-                  <div className="bg-gradient-to-r from-blue-600 to-indigo-600 text-white p-4 rounded-2xl w-fit mx-auto mb-6">
-                    <GraduationCap className="w-8 h-8" />
-                  </div>
-                  <h3 className="text-2xl font-bold text-gray-900 mb-4">Sou aluno e quero trabalhar</h3>
-                  <p className="text-gray-600 mb-8 leading-relaxed">
-                    Encontre projetos interessantes, colabore com outros estudantes e ganhe experiência prática em desenvolvimento.
-                  </p>
-                  <Link
-                    to="/register"
-                    className="inline-flex items-center justify-center w-full bg-gradient-to-r from-blue-600 to-indigo-600 text-white px-8 py-4 rounded-xl font-semibold hover:from-blue-700 hover:to-indigo-700 transition-all duration-300 group-hover:shadow-lg"
-                  >
-                    Começar Agora
-                    <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform duration-300" />
-                  </Link>
-                </div>
-              </div>
-
-              {/* Client Card - futuramente */}
-              <div className="group relative bg-gray-50 rounded-3xl p-8 shadow-lg border-2 border-gray-200 opacity-75">
-                <div className="relative">
-                  <div className="bg-gray-400 text-white p-4 rounded-2xl w-fit mx-auto mb-6">
-                    <Briefcase className="w-8 h-8" />
-                  </div>
-                  <h3 className="text-2xl font-bold text-gray-700 mb-4">Preciso de um projeto</h3>
-                  <p className="text-gray-500 mb-8 leading-relaxed">
-                    Publique seus projetos e encontre estudantes talentosos para desenvolvê-los. Em breve!
-                  </p>
-                  <div className="inline-flex items-center justify-center w-full bg-gray-300 text-gray-500 px-8 py-4 rounded-xl font-semibold cursor-not-allowed">
-                    Em Breve
-                  </div>
-                  <div className="absolute top-4 right-4 bg-yellow-100 text-yellow-800 px-3 py-1 rounded-full text-sm font-medium">
-                    Próxima versão
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* Quick Stats */}
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-8 max-w-3xl mx-auto">
-              <div className="text-center">
-                <div className="text-3xl font-bold text-blue-600 mb-2">100+</div>
-                <div className="text-gray-600">Estudantes</div>
-              </div>
-              <div className="text-center">
-                <div className="text-3xl font-bold text-indigo-600 mb-2">50+</div>
-                <div className="text-gray-600">Projetos</div>
-              </div>
-              <div className="text-center">
-                <div className="text-3xl font-bold text-purple-600 mb-2">20+</div>
-                <div className="text-gray-600">Universidades</div>
-              </div>
-              <div className="text-center">
-                <div className="text-3xl font-bold text-pink-600 mb-2">95%</div>
-                <div className="text-gray-600">Satisfação</div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Features Section */}
-      <section className="py-20 bg-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold text-gray-900 mb-4">
-              Por que escolher o CampusDevs?
-            </h2>
-            <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-              Nossa plataforma oferece tudo que você precisa para desenvolver suas habilidades e construir um portfólio impressionante.
-            </p>
-          </div>
-
-          <div className="grid md:grid-cols-3 gap-8">
-            <div className="group bg-gradient-to-br from-blue-50 to-indigo-50 rounded-2xl p-8 hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
-              <div className="bg-gradient-to-r from-blue-600 to-indigo-600 text-white p-3 rounded-xl w-fit mb-6">
-                <Code className="w-6 h-6" />
-              </div>
-              <h3 className="text-xl font-bold text-gray-900 mb-4">Projetos Reais</h3>
-              <p className="text-gray-600 leading-relaxed">
-                Trabalhe em projetos que simulam o ambiente profissional e ganhe experiência prática valiosa.
-              </p>
-            </div>
-
-            <div className="group bg-gradient-to-br from-purple-50 to-pink-50 rounded-2xl p-8 hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
-              <div className="bg-gradient-to-r from-purple-600 to-pink-600 text-white p-3 rounded-xl w-fit mb-6">
-                <Users className="w-6 h-6" />
-              </div>
-              <h3 className="text-xl font-bold text-gray-900 mb-4">Colaboração</h3>
-              <p className="text-gray-600 leading-relaxed">
-                Colabore com outros estudantes, aprenda em equipe e desenvolva habilidades de trabalho colaborativo.
-              </p>
-            </div>
-
-            <div className="group bg-gradient-to-br from-green-50 to-emerald-50 rounded-2xl p-8 hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
-              <div className="bg-gradient-to-r from-green-600 to-emerald-600 text-white p-3 rounded-xl w-fit mb-6">
-                <Trophy className="w-6 h-6" />
-              </div>
-              <h3 className="text-xl font-bold text-gray-900 mb-4">Portfólio</h3>
-              <p className="text-gray-600 leading-relaxed">
-                Construa um portfólio impressionante com projetos reais que demonstram suas habilidades técnicas.
-              </p>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Benefits Section */}
-      <section className="py-20 bg-gradient-to-br from-gray-50 to-blue-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid lg:grid-cols-2 gap-16 items-center">
-            <div>
-              <h2 className="text-4xl font-bold text-gray-900 mb-8">
-                Benefícios Exclusivos para Estudantes
-              </h2>
-              <div className="space-y-6">
-                {[
-                  'Acesso gratuito para estudantes universitários',
-                  'Projetos reais de empresas e organizações',
-                  'Networking com outros desenvolvedores',
-                  'Portfólio de projetos para o mercado de trabalho',
-                  'Mentoria de desenvolvedores experientes',
-                  'Certificados de participação em projetos'
-                ].map((benefit, index) => (
-                  <div key={index} className="flex items-start space-x-4">
-                    <div className="bg-gradient-to-r from-green-500 to-emerald-500 text-white p-1 rounded-full mt-1">
-                      <CheckCircle className="w-4 h-4" />
-                    </div>
-                    <p className="text-gray-700 text-lg">{benefit}</p>
-                  </div>
-                ))}
-              </div>
-            </div>
-            <div className="bg-white rounded-3xl p-8 shadow-2xl">
-              <div className="text-center">
-                <div className="bg-gradient-to-r from-blue-600 to-indigo-600 text-white p-6 rounded-2xl w-fit mx-auto mb-6">
-                  <Star className="w-12 h-12" />
-                </div>
-                <h3 className="text-2xl font-bold text-gray-900 mb-4">Comece Sua Jornada</h3>
-                <p className="text-gray-600 mb-8">
-                  Junte-se a centenas de estudantes que já estão desenvolvendo suas carreiras através de projetos colaborativos.
-                </p>
-                <Link
-                  to="/register"
-                  className="inline-flex items-center justify-center w-full bg-gradient-to-r from-blue-600 to-indigo-600 text-white px-8 py-4 rounded-xl font-semibold hover:from-blue-700 hover:to-indigo-700 transition-all duration-300 shadow-lg hover:shadow-xl"
-                >
-                  Criar Conta Gratuita
-                  <ArrowRight className="ml-2 w-5 h-5" />
-                </Link>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* How it Works */}
-      <section className="py-20 bg-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold text-gray-900 mb-4">Como Funciona?</h2>
-            <p className="text-xl text-gray-600">Apenas 3 passos simples para começar</p>
-          </div>
-
-          <div className="grid md:grid-cols-3 gap-8">
-            <div className="text-center group">
-              <div className="bg-gradient-to-r from-blue-600 to-indigo-600 text-white w-16 h-16 rounded-full flex items-center justify-center text-2xl font-bold mx-auto mb-6 group-hover:scale-110 transition-transform duration-300">
-                1
-              </div>
-              <h3 className="text-xl font-bold text-gray-900 mb-4">Cadastre-se</h3>
-              <p className="text-gray-600">Use seu email universitário para criar sua conta gratuita e completar seu perfil.</p>
-            </div>
-
-            <div className="text-center group">
-              <div className="bg-gradient-to-r from-purple-600 to-pink-600 text-white w-16 h-16 rounded-full flex items-center justify-center text-2xl font-bold mx-auto mb-6 group-hover:scale-110 transition-transform duration-300">
-                2
-              </div>
-              <h3 className="text-xl font-bold text-gray-900 mb-4">Encontre Projetos</h3>
-              <p className="text-gray-600">Explore projetos que combinam com suas habilidades e interesses técnicos.</p>
-            </div>
-
-            <div className="text-center group">
-              <div className="bg-gradient-to-r from-green-600 to-emerald-600 text-white w-16 h-16 rounded-full flex items-center justify-center text-2xl font-bold mx-auto mb-6 group-hover:scale-110 transition-transform duration-300">
-                3
-              </div>
-              <h3 className="text-xl font-bold text-gray-900 mb-4">Colabore</h3>
-              <p className="text-gray-600">Trabalhe em equipe e desenvolva soluções incríveis para problemas reais.</p>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* CTA Section */}
-      <section className="py-20 bg-gradient-to-r from-blue-600 to-indigo-600">
-        <div className="max-w-4xl mx-auto text-center px-4 sm:px-6 lg:px-8">
-          <h2 className="text-4xl font-bold text-white mb-6">
-            Pronto para começar sua jornada?
-          </h2>
-          <p className="text-xl text-blue-100 mb-10">
-            Junte-se à comunidade de estudantes que estão transformando suas carreiras através de projetos colaborativos.
+const LandingPage = () => (
+  <main className="overflow-hidden">
+    <section className="relative border-b border-[#dfe5dc]">
+      <div className="mx-auto grid max-w-7xl gap-14 px-6 pb-24 pt-20 lg:grid-cols-[1.05fr_.95fr] lg:items-center lg:px-8 lg:pt-28">
+        <div>
+          <p className="eyebrow mb-6">Uma rede para quem faz</p>
+          <h1 className="display-title max-w-3xl text-6xl leading-[.95] sm:text-7xl lg:text-[6.8rem]">
+            Ideias boas ficam melhores <span className="text-[#758e38]">em equipe.</span>
+          </h1>
+          <p className="mt-8 max-w-xl text-lg leading-8 text-[#657066]">
+            O CampusDev aproxima estudantes de tecnologia e projetos que merecem sair do papel — com clareza, colaboração e espaço para aprender.
           </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Link
-              to="/register"
-              className="inline-flex items-center justify-center bg-white text-blue-600 px-8 py-4 rounded-xl font-semibold hover:bg-gray-50 transition-all duration-300 shadow-lg hover:shadow-xl"
-            >
-              Criar Conta Gratuita
-              <ArrowRight className="ml-2 w-5 h-5" />
+          <div className="mt-10 flex flex-wrap items-center gap-4">
+            <Link to="/register" className="inline-flex items-center gap-3 rounded-full bg-[#18221d] px-6 py-3.5 font-bold text-[#c8f169] transition-transform hover:-translate-y-0.5">
+              Entrar para a rede <ArrowUpRight className="h-4 w-4" />
             </Link>
-            <Link
-              to="/projects"
-              className="inline-flex items-center justify-center border-2 border-white text-white px-8 py-4 rounded-xl font-semibold hover:bg-white hover:text-blue-600 transition-all duration-300"
-            >
-              <Search className="mr-2 w-5 h-5" />
-              Ver Projetos
+            <Link to="/projects" className="inline-flex items-center gap-2 px-4 py-3.5 font-bold text-[#657066] hover:text-[#18221d]">
+              Ver projetos <MoveRight className="h-4 w-4" />
             </Link>
           </div>
+          <div className="mt-14 flex gap-10 border-t border-[#dfe5dc] pt-6">
+            <div><strong className="block text-2xl font-black">100+</strong><span className="text-sm text-[#657066]">pessoas criando</span></div>
+            <div><strong className="block text-2xl font-black">50+</strong><span className="text-sm text-[#657066]">ideias em movimento</span></div>
+            <div><strong className="block text-2xl font-black">01</strong><span className="text-sm text-[#657066]">comunidade</span></div>
+          </div>
         </div>
-      </section>
-    </div>
-  );
-};
+        <div className="relative">
+          <div className="absolute -right-10 -top-10 h-44 w-44 rounded-full bg-[#c8f169] blur-3xl opacity-70" />
+          <div className="soft-panel relative p-5 sm:p-7">
+            <div className="flex items-center justify-between border-b border-[#e5eae3] pb-5">
+              <div><p className="eyebrow">Painel da comunidade</p><p className="mt-1 font-bold">O que está acontecendo agora</p></div>
+              <Sparkles className="h-5 w-5 text-[#758e38]" />
+            </div>
+            <div className="space-y-3 py-5">
+              <div className="rounded-2xl bg-[#f2f5ef] p-4">
+                <div className="flex items-center justify-between"><span className="text-xs font-bold uppercase tracking-wider text-[#758e38]">Novo projeto</span><span className="h-2 w-2 rounded-full bg-[#9bc14b]" /></div>
+                <h3 className="mt-3 text-xl font-black">Mapa do campus</h3>
+                <p className="mt-1 text-sm text-[#657066]">Uma experiência simples para encontrar lugares e pessoas.</p>
+                <div className="mt-4 flex gap-2"><span className="rounded-full bg-white px-3 py-1 text-xs font-semibold">React</span><span className="rounded-full bg-white px-3 py-1 text-xs font-semibold">UX</span></div>
+              </div>
+              <div className="flex items-center gap-4 rounded-2xl border border-[#e5eae3] p-4">
+                <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-[#18221d] text-[#c8f169]"><UsersRound className="h-5 w-5" /></div>
+                <div><p className="font-bold">3 pessoas entraram hoje</p><p className="text-sm text-[#657066]">novas conexões na comunidade</p></div>
+              </div>
+            </div>
+            <div className="flex items-center gap-3 border-t border-[#e5eae3] pt-5 text-sm font-semibold text-[#657066]"><Code2 className="h-4 w-4 text-[#758e38]" /> Feito para aprender fazendo.</div>
+          </div>
+        </div>
+      </div>
+    </section>
 
-export default LandingPage;
+    <section className="mx-auto max-w-7xl px-6 py-24 lg:px-8">
+      <div className="grid gap-12 lg:grid-cols-[.7fr_1.3fr]">
+        <div><p className="eyebrow mb-4">Sem complicação</p><h2 className="display-title text-4xl sm:text-5xl">Menos vitrine.<br /><span className="text-[#758e38]">Mais prática.</span></h2></div>
+        <div className="grid gap-4 md:grid-cols-3">
+          {steps.map(([number, title, text]) => <article key={number} className="soft-panel p-6">
+            <span className="text-sm font-black text-[#9bad8f]">{number}</span>
+            <h3 className="mt-12 text-xl font-black">{title}</h3>
+            <p className="mt-3 text-sm leading-6 text-[#657066]">{text}</p>
+          </article>)}
+        </div>
+      </div>
+    </section>
+
+    <section className="bg-[#18221d] text-white">
+      <div className="mx-auto flex max-w-7xl flex-col gap-8 px-6 py-16 sm:flex-row sm:items-center sm:justify-between lg:px-8">
+        <div><p className="eyebrow !text-[#c8f169]">Seu próximo projeto começa aqui</p><h2 className="mt-3 max-w-2xl text-4xl font-black tracking-[-.05em] sm:text-5xl">Tem uma ideia? Encontre quem queira construir com você.</h2></div>
+        <Link to="/register" className="inline-flex shrink-0 items-center gap-3 rounded-full bg-[#c8f169] px-6 py-3.5 font-black text-[#18221d] hover:bg-[#d8f58e]">Criar meu perfil <ArrowUpRight className="h-4 w-4" /></Link>
+      </div>
+    </section>
+  </main>
+)
+
+export default LandingPage
