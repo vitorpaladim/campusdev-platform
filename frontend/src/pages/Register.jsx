@@ -88,7 +88,7 @@ const Register = () => {
         }),
       })
 
-      const data = await response.json()
+      const data = await response.json().catch(() => ({}))
 
       if (response.ok) {
         setSuccess(true)
@@ -98,8 +98,9 @@ const Register = () => {
       } else {
         setError(data.error || 'Erro ao criar conta')
       }
-    } catch {
-      setError('Erro de conexão. Tente novamente.')
+    } catch (requestError) {
+      console.error('Falha ao criar cadastro:', requestError)
+      setError('Não foi possível conectar à API. Tente novamente.')
     } finally {
       setLoading(false)
     }

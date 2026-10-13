@@ -37,7 +37,7 @@ const Login = ({ onLogin }) => {
         body: JSON.stringify(formData),
       })
 
-      const data = await response.json()
+      const data = await response.json().catch(() => ({}))
 
       if (response.ok) {
         // Salvar token no localStorage
@@ -52,8 +52,9 @@ const Login = ({ onLogin }) => {
       } else {
         setError(data.error || 'Erro ao fazer login')
       }
-    } catch {
-      setError('Erro de conexão. Tente novamente.')
+    } catch (requestError) {
+      console.error('Falha ao realizar login:', requestError)
+      setError('Não foi possível conectar à API. Tente novamente.')
     } finally {
       setLoading(false)
     }
