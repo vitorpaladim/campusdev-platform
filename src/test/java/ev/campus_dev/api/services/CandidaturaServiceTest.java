@@ -5,6 +5,7 @@ import ev.campus_dev.api.models.candidatura.Candidatura;
 import ev.campus_dev.api.models.projeto.Projeto;
 import ev.campus_dev.api.models.usuario.Usuario;
 import ev.campus_dev.api.repositories.CandidaturaRepository;
+import ev.campus_dev.api.repositories.DesenvolvedorRepository;
 import ev.campus_dev.api.repositories.ProjetoRepository;
 import ev.campus_dev.api.repositories.UsuarioRepository;
 import org.junit.jupiter.api.Test;
@@ -25,6 +26,8 @@ class CandidaturaServiceTest {
     ProjetoRepository projetoRepository;
     @Mock
     UsuarioRepository usuarioRepository;
+    @Mock
+    DesenvolvedorRepository desenvolvedorRepository;
 
     @Test
     void naoDevePermitirCandidaturaEmProjetoFechado() {
@@ -54,6 +57,6 @@ class CandidaturaServiceTest {
     }
 
     private CandidaturaService service() {
-        return new CandidaturaService(candidaturaRepository, projetoRepository, usuarioRepository);
+        return new CandidaturaService(candidaturaRepository, projetoRepository, usuarioRepository, desenvolvedorRepository);
     }
 }

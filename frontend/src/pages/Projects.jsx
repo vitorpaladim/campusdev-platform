@@ -134,7 +134,7 @@ const Projects = ({ user, token }) => {
 
       if (response.ok) {
         fetchProjects() // Recarregar lista
-        alert('Você entrou no projeto com sucesso!')
+        alert('Candidatura enviada! O responsável poderá analisar seu perfil.')
       } else {
         alert(data.error || 'Erro ao entrar no projeto')
       }
@@ -179,6 +179,14 @@ const Projects = ({ user, token }) => {
   const isUserInProject = () => {
     return false
   }
+
+  const getInitials = (name) => (name || '?')
+    .split(' ')
+    .filter(Boolean)
+    .slice(0, 2)
+    .map((part) => part[0])
+    .join('')
+    .toUpperCase()
 
   if (loading) {
     return (
@@ -433,6 +441,25 @@ const Projects = ({ user, token }) => {
                         <span>{new Date(project.prazoEntrega).toLocaleDateString()}</span>
                       </div>
                     )}
+
+                  </div>
+
+                  <div className="flex items-center gap-2 border-t pt-3">
+                        <div className="flex -space-x-2">
+                          {project.cliente && (
+                            <div className="flex h-8 w-8 items-center justify-center rounded-full border-2 border-white bg-[#18221d] text-[10px] font-bold text-[#c8f169]" title="Responsável pelo projeto">
+                              {getInitials(project.cliente.nomeCompleto || project.cliente.nomeEmpresa)}
+                            </div>
+                          )}
+                          {(project.desenvolvedores || []).slice(0, 4).map((member) => (
+                            <div key={member.id} className="flex h-8 w-8 items-center justify-center rounded-full border-2 border-white bg-[#dfe5dc] text-[10px] font-bold text-[#18221d]" title={member.nomeCompleto}>
+                              {getInitials(member.nomeCompleto)}
+                            </div>
+                          ))}
+                        </div>
+                        <span className="text-xs text-gray-500">
+                          {project.desenvolvedores?.length ? 'Equipe em formação' : 'Seja a primeira pessoa da equipe'}
+                        </span>
                   </div>
 
                   <div className="pt-2">
