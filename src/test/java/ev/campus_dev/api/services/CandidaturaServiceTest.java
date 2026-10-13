@@ -12,6 +12,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.security.core.Authentication;
 
 import java.util.Optional;
 
@@ -28,15 +29,21 @@ class CandidaturaServiceTest {
     UsuarioRepository usuarioRepository;
     @Mock
     DesenvolvedorRepository desenvolvedorRepository;
+    @Mock
+    Authentication authentication;
 
     @Test
     void naoDevePermitirCandidaturaEmProjetoFechado() {
         Projeto projeto = new Projeto();
         projeto.setStatus("EM_ANDAMENTO");
         when(projetoRepository.findById(1L)).thenReturn(Optional.of(projeto));
-        when(usuarioRepository.findById(2L)).thenReturn(Optional.of(new Usuario()));
+        Usuario desenvolvedor = new Usuario();
+        desenvolvedor.setEmail("dev@example.com");
+        desenvolvedor.setRole("DEV");
+        when(usuarioRepository.findById(2L)).thenReturn(Optional.of(desenvolvedor));
+        when(authentication.getName()).thenReturn("dev@example.com");
 
-        assertThatThrownBy(() -> service().candidatar(1L, 2L))
+        assertThatThrownBy(() -> service().candidatar(1L, 2L, authentication))
                 .isInstanceOf(BusinessException.class)
                 .hasMessage("O projeto não está aberto para candidaturas");
         verify(candidaturaRepository, never()).save(any());
@@ -47,10 +54,14 @@ class CandidaturaServiceTest {
         Projeto projeto = new Projeto();
         projeto.setStatus("ABERTO");
         when(projetoRepository.findById(1L)).thenReturn(Optional.of(projeto));
-        when(usuarioRepository.findById(2L)).thenReturn(Optional.of(new Usuario()));
+        Usuario desenvolvedor = new Usuario();
+        desenvolvedor.setEmail("dev@example.com");
+        desenvolvedor.setRole("DEV");
+        when(usuarioRepository.findById(2L)).thenReturn(Optional.of(desenvolvedor));
+        when(authentication.getName()).thenReturn("dev@example.com");
         when(candidaturaRepository.existsByProjetoIdAndDesenvolvedorId(1L, 2L)).thenReturn(true);
 
-        assertThatThrownBy(() -> service().candidatar(1L, 2L))
+        assertThatThrownBy(() -> service().candidatar(1L, 2L, authentication))
                 .isInstanceOf(BusinessException.class)
                 .hasMessage("Candidatura duplicada");
         verify(candidaturaRepository, never()).save(any());

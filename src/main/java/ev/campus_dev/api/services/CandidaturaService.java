@@ -12,6 +12,8 @@ import ev.campus_dev.api.repositories.ProjetoRepository;
 import ev.campus_dev.api.repositories.UsuarioRepository;
 import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.core.Authentication;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -32,11 +34,15 @@ public class CandidaturaService {
     }
 
     @Transactional
-    public Candidatura candidatar(Long projetoId, Long desenvolvedorId) {
+    public Candidatura candidatar(Long projetoId, Long desenvolvedorId, Authentication authentication) {
         Projeto projeto = projetoRepository.findById(projetoId)
                 .orElseThrow(() -> new ResourceNotFoundException("Projeto não encontrado"));
         Usuario desenvolvedor = usuarioRepository.findById(desenvolvedorId)
                 .orElseThrow(() -> new ResourceNotFoundException("Desenvolvedor não encontrado"));
+        if (!desenvolvedor.getEmail().equals(authentication.getName())
+                || !"DEV".equals(desenvolvedor.getRole())) {
+            throw new AccessDeniedException("Você só pode enviar candidatura em seu próprio nome");
+        }
         if (!"ABERTO".equals(projeto.getStatus())) {
             throw new BusinessException("O projeto não está aberto para candidaturas");
         }
@@ -50,14 +56,18 @@ public class CandidaturaService {
         return candidaturaRepository.save(candidatura);
     }
 
-    public List<Candidatura> listarPorProjeto(Long projetoId) {
+    public List<Candidatura> listarPorProjeto(Long projetoId, Authentication authentication) {
+        Projeto projeto = projetoRepository.findById(projetoId)
+                .orElseThrow(() -> new ResourceNotFoundException("Projeto não encontrado"));
+        verificarSolicitante(projeto, authentication);
         return candidaturaRepository.findByProjetoId(projetoId);
     }
 
     @Transactional
-    public Candidatura decidir(Long id, StatusCandidatura status) {
+    public Candidatura decidir(Long id, StatusCandidatura status, Authentication authentication) {
         Candidatura candidatura = candidaturaRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Candidatura não encontrada"));
+        verificarSolicitante(candidatura.getProjeto(), authentication);
         if (status != StatusCandidatura.APROVADA && status != StatusCandidatura.RECUSADA) {
             throw new BusinessException("Decisão inválida");
         }
@@ -76,5 +86,12 @@ public class CandidaturaService {
         }
         candidatura.setStatus(status);
         return candidaturaRepository.save(candidatura);
+    }
+
+    private void verificarSolicitante(Projeto projeto, Authentication authentication) {
+        if (projeto.getCliente() == null
+                || !projeto.getCliente().getEmail().equals(authentication.getName())) {
+            throw new AccessDeniedException("Apenas o solicitante do projeto pode gerenciar candidaturas");
+        }
     }
 }

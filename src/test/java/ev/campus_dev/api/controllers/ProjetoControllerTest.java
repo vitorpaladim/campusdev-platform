@@ -45,7 +45,7 @@ class ProjetoControllerTest {
 
     @Test
     void deveRetornar201AoCadastrarProjetoValido() throws Exception {
-        when(projetoService.cadastrar(any(), any())).thenReturn(new Projeto());
+        when(projetoService.cadastrar(any(), any(), any())).thenReturn(new Projeto());
 
         mockMvc.perform(post("/projetos/1")
                         .contentType("application/json")

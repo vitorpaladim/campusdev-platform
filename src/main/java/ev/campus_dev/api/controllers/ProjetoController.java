@@ -18,6 +18,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import org.springframework.security.core.Authentication;
 
 @RestController
 @RequestMapping("/projetos")
@@ -39,8 +40,9 @@ public class ProjetoController {
             @ApiResponse(responseCode = "403", description = "Usuário sem permissão")
     })
     @SecurityRequirement(name = "bearerAuth")
-    public ResponseEntity<Projeto> cadastrar(@PathVariable Long clienteId, @RequestBody @Valid CadastroProjeto dados) {
-        Projeto salvo = projetoService.cadastrar(clienteId, dados);
+    public ResponseEntity<Projeto> cadastrar(@PathVariable Long clienteId, @RequestBody @Valid CadastroProjeto dados,
+                                             Authentication authentication) {
+        Projeto salvo = projetoService.cadastrar(clienteId, dados, authentication);
         return ResponseEntity.status(201).body(salvo);
     }
 
@@ -65,8 +67,9 @@ public class ProjetoController {
     @PutMapping("/{id}")
     @Operation(summary = "Atualizar projeto")
     @SecurityRequirement(name = "bearerAuth")
-    public ResponseEntity<Projeto> atualizar(@PathVariable Long id, @RequestBody AtualizacaoProjeto dados) {
-        return projetoService.atualizar(id, dados)
+    public ResponseEntity<Projeto> atualizar(@PathVariable Long id, @RequestBody AtualizacaoProjeto dados,
+                                             Authentication authentication) {
+        return projetoService.atualizar(id, dados, authentication)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }
@@ -74,8 +77,8 @@ public class ProjetoController {
     @DeleteMapping("/{id}")
     @Operation(summary = "Excluir projeto")
     @SecurityRequirement(name = "bearerAuth")
-    public ResponseEntity<Void> deletar(@PathVariable Long id) {
-        return projetoService.deletar(id)
+    public ResponseEntity<Void> deletar(@PathVariable Long id, Authentication authentication) {
+        return projetoService.deletar(id, authentication)
                 ? ResponseEntity.noContent().build()
                 : ResponseEntity.notFound().build();
     }
@@ -83,8 +86,9 @@ public class ProjetoController {
     @PatchMapping("/{id}/status")
     @Operation(summary = "Alterar status do projeto", description = "Aplica apenas transições de status permitidas.")
     @SecurityRequirement(name = "bearerAuth")
-    public ResponseEntity<Projeto> alterarStatus(@PathVariable Long id, @RequestParam String status) {
-        return projetoService.alterarStatus(id, status)
+    public ResponseEntity<Projeto> alterarStatus(@PathVariable Long id, @RequestParam String status,
+                                                 Authentication authentication) {
+        return projetoService.alterarStatus(id, status, authentication)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }

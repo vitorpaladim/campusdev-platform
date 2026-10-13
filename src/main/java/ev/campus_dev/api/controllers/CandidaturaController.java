@@ -10,6 +10,7 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
 import java.util.List;
+import org.springframework.security.core.Authentication;
 
 @RestController
 @RequestMapping("/candidaturas")
@@ -24,19 +25,21 @@ public class CandidaturaController {
 
     @PostMapping("/projetos/{projetoId}/desenvolvedores/{desenvolvedorId}")
     @Operation(summary = "Enviar candidatura")
-    public ResponseEntity<Candidatura> candidatar(@PathVariable Long projetoId, @PathVariable Long desenvolvedorId) {
-        return ResponseEntity.status(201).body(candidaturaService.candidatar(projetoId, desenvolvedorId));
+    public ResponseEntity<Candidatura> candidatar(@PathVariable Long projetoId, @PathVariable Long desenvolvedorId,
+                                                  Authentication authentication) {
+        return ResponseEntity.status(201).body(candidaturaService.candidatar(projetoId, desenvolvedorId, authentication));
     }
 
     @GetMapping("/projetos/{projetoId}")
     @Operation(summary = "Listar candidaturas do projeto")
-    public ResponseEntity<List<Candidatura>> listar(@PathVariable Long projetoId) {
-        return ResponseEntity.ok(candidaturaService.listarPorProjeto(projetoId));
+    public ResponseEntity<List<Candidatura>> listar(@PathVariable Long projetoId, Authentication authentication) {
+        return ResponseEntity.ok(candidaturaService.listarPorProjeto(projetoId, authentication));
     }
 
     @PatchMapping("/{id}")
     @Operation(summary = "Decidir candidatura", description = "Aceita ou recusa uma candidatura.")
-    public ResponseEntity<Candidatura> decidir(@PathVariable Long id, @RequestParam StatusCandidatura status) {
-        return ResponseEntity.ok(candidaturaService.decidir(id, status));
+    public ResponseEntity<Candidatura> decidir(@PathVariable Long id, @RequestParam StatusCandidatura status,
+                                               Authentication authentication) {
+        return ResponseEntity.ok(candidaturaService.decidir(id, status, authentication));
     }
 }

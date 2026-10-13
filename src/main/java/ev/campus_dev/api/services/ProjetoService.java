@@ -10,6 +10,8 @@ import ev.campus_dev.api.exceptions.BusinessException;
 import ev.campus_dev.api.exceptions.ResourceNotFoundException;
 import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.core.Authentication;
 
 import java.util.List;
 import java.util.Optional;
@@ -26,9 +28,10 @@ public class ProjetoService {
     }
 
     @Transactional
-    public Projeto cadastrar(Long clienteId, CadastroProjeto dados) {
+    public Projeto cadastrar(Long clienteId, CadastroProjeto dados, Authentication authentication) {
         Cliente cliente = clienteRepository.findById(clienteId)
                 .orElseThrow(() -> new ResourceNotFoundException("Cliente não encontrado"));
+        verificarProprietario(cliente, authentication);
         Projeto projeto = new Projeto(dados);
         projeto.setCliente(cliente);
         return projetoRepository.save(projeto);
@@ -43,18 +46,20 @@ public class ProjetoService {
     }
 
     @Transactional
-    public Optional<Projeto> atualizar(Long id, AtualizacaoProjeto dados) {
+    public Optional<Projeto> atualizar(Long id, AtualizacaoProjeto dados, Authentication authentication) {
         return projetoRepository.findById(id)
                 .map(projeto -> {
+                    verificarProprietario(projeto.getCliente(), authentication);
                     projeto.atualizarProjeto(dados);
                     return projetoRepository.save(projeto);
                 });
     }
 
     @Transactional
-    public boolean deletar(Long id) {
+    public boolean deletar(Long id, Authentication authentication) {
         return projetoRepository.findById(id)
                 .map(projeto -> {
+                    verificarProprietario(projeto.getCliente(), authentication);
                     projetoRepository.delete(projeto);
                     return true;
                 })
@@ -62,15 +67,23 @@ public class ProjetoService {
     }
 
     @Transactional
-    public Optional<Projeto> alterarStatus(Long id, String novoStatus) {
+    public Optional<Projeto> alterarStatus(Long id, String novoStatus, Authentication authentication) {
         return projetoRepository.findById(id).map(projeto -> {
+            verificarProprietario(projeto.getCliente(), authentication);
             String atual = projeto.getStatus();
             if (!transicaoPermitida(atual, novoStatus)) {
                 throw new BusinessException("Transição de status inválida: " + atual + " -> " + novoStatus);
             }
+
             projeto.setStatus(novoStatus);
             return projetoRepository.save(projeto);
         });
+    }
+
+    private void verificarProprietario(Cliente cliente, Authentication authentication) {
+        if (cliente == null || !cliente.getEmail().equals(authentication.getName())) {
+            throw new AccessDeniedException("Apenas o solicitante pode gerenciar este projeto");
+        }
     }
 
     private boolean transicaoPermitida(String atual, String novoStatus) {
