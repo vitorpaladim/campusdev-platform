@@ -1,0 +1,12 @@
+.git
+.github
+.mvn/wrapper/maven-wrapper.jar
+target
+frontend/node_modules
+frontend/dist
+frontend/.vite
+node_modules
+*.log
+.env
+.env.*
+README.md
