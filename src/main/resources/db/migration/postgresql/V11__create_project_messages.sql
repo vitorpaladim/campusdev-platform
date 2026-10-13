@@ -1,0 +1,7 @@
+CREATE TABLE mensagens_projeto (
+    id BIGSERIAL PRIMARY KEY,
+    projeto_id BIGINT NOT NULL REFERENCES projetos(id_projeto) ON DELETE CASCADE,
+    autor_id BIGINT NOT NULL REFERENCES usuarios(id) ON DELETE CASCADE,
+    conteudo VARCHAR(2000) NOT NULL,
+    enviada_em TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+);

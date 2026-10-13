@@ -9,7 +9,7 @@ import { Badge } from '@/components/ui/badge'
 import { Alert, AlertDescription } from '@/components/ui/alert'
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import { Plus, Users, Calendar, Code, Search, Filter, AlertCircle, CheckCircle } from 'lucide-react'
+import { Plus, Users, Calendar, Code, Search, Filter, AlertCircle, CheckCircle, MessageCircle } from 'lucide-react'
 import { apiFetch } from '@/api/client'
 
 const Projects = ({ user, token }) => {
@@ -22,6 +22,11 @@ const Projects = ({ user, token }) => {
   const [showCreateDialog, setShowCreateDialog] = useState(false)
   const [createLoading, setCreateLoading] = useState(false)
   const [createError, setCreateError] = useState('')
+  const [chatProject, setChatProject] = useState(null)
+  const [messages, setMessages] = useState([])
+  const [messageText, setMessageText] = useState('')
+  const [chatLoading, setChatLoading] = useState(false)
+  const [chatError, setChatError] = useState('')
 
   const [newProject, setNewProject] = useState({
     titulo: '',
@@ -120,6 +125,46 @@ const Projects = ({ user, token }) => {
     if (!user) {
       alert('Você precisa estar logado para participar de um projeto')
       return
+    }
+
+    const openChat = async (project) => {
+      setChatProject(project)
+      setMessages([])
+      setChatError('')
+      setChatLoading(true)
+      try {
+        const response = await apiFetch(`/projetos/${project.idProjeto}/mensagens`)
+        const data = await response.json().catch(() => [])
+        if (!response.ok) {
+          throw new Error(data.error || 'Não foi possível carregar o chat')
+        }
+        setMessages(data)
+      } catch (requestError) {
+        setChatError(requestError.message)
+      } finally {
+        setChatLoading(false)
+      }
+    }
+
+    const sendMessage = async (event) => {
+      event.preventDefault()
+      if (!chatProject || !messageText.trim()) return
+      setChatLoading(true)
+      setChatError('')
+      try {
+        const response = await apiFetch(`/projetos/${chatProject.idProjeto}/mensagens`, {
+          method: 'POST',
+          body: JSON.stringify({ conteudo: messageText.trim() }),
+        })
+        const data = await response.json().catch(() => ({}))
+        if (!response.ok) throw new Error(data.error || 'Não foi possível enviar a mensagem')
+        setMessages((current) => [...current, data])
+        setMessageText('')
+      } catch (requestError) {
+        setChatError(requestError.message)
+      } finally {
+        setChatLoading(false)
+      }
     }
 
     try {
@@ -463,6 +508,11 @@ const Projects = ({ user, token }) => {
                   </div>
 
                   <div className="pt-2">
+                    {user && (project.cliente?.id === user.id || project.desenvolvedores?.some((member) => member.id === user.id)) && (
+                      <Button variant="outline" className="mb-2 w-full" onClick={() => openChat(project)}>
+                        <MessageCircle className="mr-2 h-4 w-4" /> Abrir conversa
+                      </Button>
+                    )}
                     {isUserInProject(project) ? (
                       <Button variant="outline" className="w-full" disabled>
                         <CheckCircle className="h-4 w-4 mr-2" />
@@ -487,6 +537,30 @@ const Projects = ({ user, token }) => {
           ))}
         </div>
       )}
+
+      <Dialog open={Boolean(chatProject)} onOpenChange={(open) => !open && setChatProject(null)}>
+        <DialogContent className="max-w-lg">
+          <DialogHeader>
+            <DialogTitle>Conversa: {chatProject?.titulo}</DialogTitle>
+            <DialogDescription>Fale com o responsável e as pessoas aprovadas neste projeto.</DialogDescription>
+          </DialogHeader>
+          <div className="max-h-80 space-y-3 overflow-y-auto rounded-xl bg-gray-50 p-4">
+            {chatLoading && messages.length === 0 && <p className="text-sm text-gray-500">Carregando conversa...</p>}
+            {!chatLoading && messages.length === 0 && <p className="text-sm text-gray-500">Ainda não há mensagens.</p>}
+            {messages.map((message) => (
+              <div key={message.id} className="rounded-xl bg-white p-3 shadow-sm">
+                <p className="text-xs font-semibold text-gray-500">{message.autor?.nomeCompleto || 'Participante'}</p>
+                <p className="mt-1 text-sm text-gray-800">{message.conteudo}</p>
+              </div>
+            ))}
+          </div>
+          {chatError && <p className="text-sm text-red-600">{chatError}</p>}
+          <form onSubmit={sendMessage} className="flex gap-2">
+            <Input value={messageText} onChange={(event) => setMessageText(event.target.value)} maxLength={2000} placeholder="Escreva uma mensagem..." />
+            <Button type="submit" disabled={chatLoading || !messageText.trim()}>Enviar</Button>
+          </form>
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }
