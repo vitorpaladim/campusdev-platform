@@ -1,0 +1,4 @@
+ALTER TABLE projetos
+    ADD COLUMN categoria VARCHAR(80) NOT NULL DEFAULT 'Outros',
+    ADD COLUMN orcamento NUMERIC(12, 2),
+    ADD COLUMN destaque BOOLEAN NOT NULL DEFAULT FALSE;

@@ -26,9 +26,11 @@ const Projects = ({ user, token }) => {
   const [newProject, setNewProject] = useState({
     titulo: '',
     descricao: '',
+    categoria: 'Desenvolvimento web',
     linguagemTecnologia: '',
     tamanhoEquipe: '',
-    prazoEntrega: ''
+    prazoEntrega: '',
+    orcamento: ''
   })
 
   useEffect(() => {
@@ -73,6 +75,9 @@ const Projects = ({ user, token }) => {
         ...newProject,
         linguagemTecnologia: newProject.linguagemTecnologia,
         qndPessoasNecessarias: parseInt(newProject.tamanhoEquipe),
+        categoria: newProject.categoria,
+        orcamento: newProject.orcamento ? Number(newProject.orcamento) : null,
+        destaque: false,
         status: 'ABERTO',
         prazoEntrega: newProject.prazoEntrega
           ? `${newProject.prazoEntrega}T00:00:00`
@@ -94,9 +99,11 @@ const Projects = ({ user, token }) => {
         setNewProject({
           titulo: '',
           descricao: '',
+          categoria: 'Desenvolvimento web',
           linguagemTecnologia: '',
           tamanhoEquipe: '',
-          prazoEntrega: ''
+          prazoEntrega: '',
+          orcamento: ''
         })
         fetchProjects() // Recarregar lista
       } else {
@@ -137,8 +144,11 @@ const Projects = ({ user, token }) => {
   }
 
   const filteredProjects = projects.filter(project => {
+    const technologies = project.linguagemTecnologia || ''
     const matchesSearch = project.titulo.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         project.descricao.toLowerCase().includes(searchTerm.toLowerCase())
+                         project.descricao.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         technologies.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         (project.categoria || '').toLowerCase().includes(searchTerm.toLowerCase())
 
     const matchesStatus = statusFilter === 'all' || project.status === statusFilter
 
@@ -239,15 +249,45 @@ const Projects = ({ user, token }) => {
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div className="space-y-2">
-                    <Label htmlFor="linguagemTecnologia">Tecnologias</Label>
+                    <Label htmlFor="categoria">Categoria</Label>
+                    <Select value={newProject.categoria} onValueChange={(value) => setNewProject({...newProject, categoria: value})}>
+                      <SelectTrigger id="categoria">
+                        <SelectValue placeholder="Escolha uma categoria" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="Desenvolvimento web">Desenvolvimento web</SelectItem>
+                        <SelectItem value="Aplicativo mobile">Aplicativo mobile</SelectItem>
+                        <SelectItem value="Design e identidade">Design e identidade</SelectItem>
+                        <SelectItem value="Marketing e conteúdo">Marketing e conteúdo</SelectItem>
+                        <SelectItem value="Dados e automação">Dados e automação</SelectItem>
+                        <SelectItem value="Outros">Outros</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="linguagemTecnologia">Ferramentas e tecnologias</Label>
                     <Input
                       id="linguagemTecnologia"
                       value={newProject.linguagemTecnologia}
                       onChange={(e) => setNewProject({...newProject, linguagemTecnologia: e.target.value})}
-                      placeholder="React, Node.js, PostgreSQL"
+                      placeholder="React, Figma, Python"
                       required
                     />
                     <p className="text-xs text-gray-500">Separe as tecnologias por vírgula</p>
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="orcamento">Orçamento estimado (opcional)</Label>
+                    <Input
+                      id="orcamento"
+                      type="number"
+                      min="0"
+                      step="0.01"
+                      value={newProject.orcamento}
+                      onChange={(e) => setNewProject({...newProject, orcamento: e.target.value})}
+                      placeholder="1500.00"
+                    />
                   </div>
 
                   <div className="space-y-2">
@@ -349,6 +389,8 @@ const Projects = ({ user, token }) => {
                 <div className="flex items-start justify-between">
                   <div className="flex-1">
                     <CardTitle className="text-lg mb-2">{project.titulo}</CardTitle>
+                    {project.destaque && <Badge className="mb-2 bg-[#c8f169] text-[#18221d]">Em destaque</Badge>}
+                    <p className="text-xs font-semibold uppercase tracking-wide text-gray-500">{project.categoria || 'Outros'}</p>
                     <Badge className={getStatusColor(project.status)}>
                       {project.status}
                     </Badge>
@@ -365,12 +407,12 @@ const Projects = ({ user, token }) => {
               <CardContent>
                 <div className="space-y-3">
                   <div className="flex flex-wrap gap-1">
-                    {project.linguagemTecnologia.slice(0, 3).map((tech, index) => (
+                    {(project.linguagemTecnologia || '').split(',').map((tech) => tech.trim()).filter(Boolean).slice(0, 3).map((tech, index) => (
                       <Badge key={index} variant="secondary" className="text-xs">
                         {tech}
                       </Badge>
                     ))}
-                    {project.linguagemTecnologia.length > 3 && (
+                    {(project.linguagemTecnologia || '').split(',').filter(Boolean).length > 3 && (
                       <Badge variant="secondary" className="text-xs">
                         +{project.linguagemTecnologia.length - 3}
                       </Badge>
@@ -380,8 +422,11 @@ const Projects = ({ user, token }) => {
                   <div className="flex items-center justify-between text-sm text-gray-500">
                     <div className="flex items-center space-x-1">
                       <Users className="h-4 w-4" />
-                      <span>{project.participantes.length}/{project.tamanhoEquipe}</span>
+                      <span>{project.desenvolvedores?.length || 0}/{project.qndPessoasNecessarias || 0} pessoas</span>
                     </div>
+                    {project.orcamento && (
+                      <span>R$ {Number(project.orcamento).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</span>
+                    )}
                     {project.prazoEntrega && (
                       <div className="flex items-center space-x-1">
                         <Calendar className="h-4 w-4" />

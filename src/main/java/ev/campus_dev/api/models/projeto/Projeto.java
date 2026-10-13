@@ -13,6 +13,7 @@ import lombok.Setter;
 import java.util.Set;
 import java.util.HashSet;
 import java.time.LocalDateTime;
+import java.math.BigDecimal;
 
 @Entity(name = "projeto")
 @Table(name = "projetos")
@@ -31,10 +32,16 @@ public class Projeto {
     @Column(nullable = false, length = 150)
     private String titulo;
     private String descricao;
+    @Column(nullable = false, length = 80)
+    private String categoria;
     @Column(name = "linguagem_tecnologia")
     private String linguagemTecnologia;
     @Column(name = "qnd_pessoas_necessarias")
     private int qndPessoasNecessarias;
+    @Column(precision = 12, scale = 2)
+    private BigDecimal orcamento;
+    @Column(nullable = false)
+    private boolean destaque;
     private String status;
     @Column(name = "data_cadastro")
     private LocalDateTime dataDeCadastro;
@@ -64,8 +71,11 @@ public class Projeto {
     public Projeto(CadastroProjeto dados) {
         this.titulo = dados.titulo();
         this.descricao = dados.descricao();
+        this.categoria = dados.categoria();
         this.linguagemTecnologia = dados.linguagemTecnologia();
         this.qndPessoasNecessarias = dados.qndPessoasNecessarias();
+        this.orcamento = dados.orcamento();
+        this.destaque = Boolean.TRUE.equals(dados.destaque());
         this.status = dados.status() == null ? "ABERTO" : dados.status();
         this.dataDeCadastro = dados.dataDeCadastro() == null ? LocalDateTime.now() : dados.dataDeCadastro();
         this.prazoEntrega = dados.prazoEntrega();
@@ -82,11 +92,20 @@ public class Projeto {
             if (dados.descricao() != null) {
                 this.descricao = dados.descricao();
             }
+            if (dados.categoria() != null) {
+                this.categoria = dados.categoria();
+            }
             if (dados.linguagemTecnologia() != null) {
                 this.linguagemTecnologia = dados.linguagemTecnologia();
             }
             if (dados.qndPessoasNecessarias() != null) {
                 this.qndPessoasNecessarias = dados.qndPessoasNecessarias();
+            }
+            if (dados.orcamento() != null) {
+                this.orcamento = dados.orcamento();
+            }
+            if (dados.destaque() != null) {
+                this.destaque = dados.destaque();
             }
             if (dados.status() != null) {
                 this.status = dados.status();
