@@ -53,6 +53,7 @@ class ProjetoControllerTest {
                                 {
                                   "titulo": "Sistema acadêmico",
                                   "descricao": "Projeto de teste",
+                                  "categoria": "Desenvolvimento web",
                                   "linguagemTecnologia": "Java, Spring",
                                   "qndPessoasNecessarias": 2
                                 }

@@ -34,7 +34,9 @@ public class SecurityConfigurations {
                     req.requestMatchers(HttpMethod.GET, "/projetos").permitAll(); // Permite que todos vejam os projetos
                     req.requestMatchers("/", "/health", "/swagger-ui.html", "/swagger-ui/**", "/v3/api-docs/**").permitAll();
                     req.requestMatchers("/desenvolvedores/**").hasAnyRole("DEV", "DESENVOLVEDOR");
-                    req.requestMatchers("/clientes/**", "/projetos/**").hasRole("CLIENTE");
+                    req.requestMatchers("/clientes/**").hasRole("CLIENTE");
+                    req.requestMatchers(HttpMethod.POST, "/projetos/**").hasRole("CLIENTE");
+                    req.requestMatchers("/projetos/**").hasAnyRole("CLIENTE", "DEV", "DESENVOLVEDOR");
                     req.anyRequest().authenticated(); // Exige autenticação para todas as outras requisições
                 })
                 .addFilterBefore(securityFilter, UsernamePasswordAuthenticationFilter.class) // Adiciona nosso filtro para ser executado antes dos filtros padrão

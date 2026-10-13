@@ -2,6 +2,8 @@ package ev.campus_dev.api.controllers;
 
 import ev.campus_dev.api.dtos.desenvolvedor_dto.CadastroDesenvolvedor;
 import ev.campus_dev.api.models.desenvolvedor.Desenvolvedor;
+import ev.campus_dev.api.models.cliente.Cliente;
+import ev.campus_dev.api.repositories.ClienteRepository;
 import ev.campus_dev.api.models.usuario.Usuario;
 import ev.campus_dev.api.repositories.DesenvolvedorRepository;
 import ev.campus_dev.api.repositories.UsuarioRepository;
@@ -46,6 +48,9 @@ public class AuthenticationController {
     private DesenvolvedorRepository desenvolvedorRepository;
 
     @Autowired
+    private ClienteRepository clienteRepository;
+
+    @Autowired
     private PasswordEncoder passwordEncoder;
 
     @PostMapping("/login")
@@ -70,7 +75,7 @@ public class AuthenticationController {
     }
 
     @PostMapping("/register")
-    @Operation(summary = "Registrar desenvolvedor", description = "Cria um usuário desenvolvedor e seu perfil.")
+    @Operation(summary = "Registrar usuário", description = "Cria um perfil de profissional ou solicitante de projeto.")
     @ApiResponses({
             @ApiResponse(responseCode = "201", description = "Usuário criado"),
             @ApiResponse(responseCode = "400", description = "Dados inválidos ou email já cadastrado")
@@ -82,22 +87,34 @@ public class AuthenticationController {
             return ResponseEntity.badRequest().body("{\"error\": \"Email já cadastrado\"}");
         }
 
-        // 2. Cria e salva a entidade base Usuario
-        Desenvolvedor novoDev = new Desenvolvedor();
-        novoDev.setNomeCompleto(dados.nomeCompleto());
-        novoDev.setEmail(dados.email());
-        novoDev.setSenha(passwordEncoder.encode(dados.senha()));
-        novoDev.setRole("DEV");
-        novoDev.setDataCadastro(LocalDateTime.now());
-        novoDev.setCurso(dados.curso()); // Pode ser nulo
-        novoDev.setSemestre(dados.semestre()); // Pode ser nulo
-        novoDev.setSkills(dados.skills()); // Pode ser nulo
-        novoDev.setTipoPerfil(dados.tipoPerfil());
-        novoDev.setBio(dados.bio());
-        novoDev.setDisponibilidade(dados.disponibilidade());
-        novoDev.setPortfolioUrl(dados.portfolioUrl());
-        novoDev.setDataDeCadastro(LocalDateTime.now());
-        desenvolvedorRepository.save(novoDev);
+        // O tipo de perfil define a subentidade persistida para que o ID
+        // usado na criação de projetos exista em clientes.
+        if ("PROCURO_SERVICO".equals(dados.tipoPerfil())) {
+            Cliente novoCliente = new Cliente();
+            novoCliente.setNomeCompleto(dados.nomeCompleto());
+            novoCliente.setEmail(dados.email());
+            novoCliente.setSenha(passwordEncoder.encode(dados.senha()));
+            novoCliente.setRole("CLIENTE");
+            novoCliente.setDataCadastro(LocalDateTime.now());
+            novoCliente.setDataDeCadastro(LocalDateTime.now());
+            clienteRepository.save(novoCliente);
+        } else {
+            Desenvolvedor novoDev = new Desenvolvedor();
+            novoDev.setNomeCompleto(dados.nomeCompleto());
+            novoDev.setEmail(dados.email());
+            novoDev.setSenha(passwordEncoder.encode(dados.senha()));
+            novoDev.setRole("DEV");
+            novoDev.setDataCadastro(LocalDateTime.now());
+            novoDev.setCurso(dados.curso());
+            novoDev.setSemestre(dados.semestre());
+            novoDev.setSkills(dados.skills());
+            novoDev.setTipoPerfil(dados.tipoPerfil());
+            novoDev.setBio(dados.bio());
+            novoDev.setDisponibilidade(dados.disponibilidade());
+            novoDev.setPortfolioUrl(dados.portfolioUrl());
+            novoDev.setDataDeCadastro(LocalDateTime.now());
+            desenvolvedorRepository.save(novoDev);
+        }
 
         // 4. Retorna uma resposta de sucesso (201 Created)
         return ResponseEntity.status(201).build();
