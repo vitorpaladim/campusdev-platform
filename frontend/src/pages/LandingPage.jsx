@@ -58,6 +58,13 @@ const LandingPage = () => (
       </div>
     </section>
 
+    <section className="mx-auto max-w-7xl px-6 py-20 lg:px-8">
+      <div className="soft-panel flex flex-col gap-6 p-7 sm:p-10 lg:flex-row lg:items-center lg:justify-between">
+        <div><p className="eyebrow">Feito para crescer junto</p><h2 className="mt-3 text-3xl font-black">Comece grátis. Destaque seu trabalho quando fizer sentido.</h2><p className="mt-3 max-w-2xl leading-7 text-[#657066]">Conheça o modelo de planos e como a plataforma pode se sustentar sem fechar a porta para novas oportunidades.</p></div>
+        <Link to="/planos" className="inline-flex shrink-0 items-center gap-2 rounded-full bg-[#18221d] px-5 py-3 font-bold text-[#c8f169]">Conhecer planos <ArrowUpRight className="h-4 w-4" /></Link>
+      </div>
+    </section>
+
     <section className="mx-auto max-w-7xl px-6 py-24 lg:px-8">
       <div className="grid gap-12 lg:grid-cols-[.7fr_1.3fr]">
         <div>        <p className="eyebrow mb-4">Dois lados, uma rede</p><h2 className="display-title text-4xl sm:text-5xl">Quem oferece.<br /><span className="text-[#758e38]">Quem precisa.</span></h2></div>

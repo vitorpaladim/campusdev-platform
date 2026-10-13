@@ -9,6 +9,7 @@ import Projects from './pages/Projects'
 import Profile from './pages/Profile'
 import Terms from './pages/Terms'
 import Privacy from './pages/Privacy'
+import Pricing from './pages/Pricing'
 import './App.css'
 
 function App() {
@@ -89,6 +90,7 @@ function App() {
           />
           <Route path="/termos" element={<Terms />} />
           <Route path="/privacidade" element={<Privacy />} />
+          <Route path="/planos" element={<Pricing />} />
           <Route
             path="/dashboard"
             element={user ? <Dashboard user={user} token={token} /> : <Navigate to="/login" />}

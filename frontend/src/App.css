@@ -80,6 +80,7 @@
     [data-theme="dev"] .app-shell { background-image: linear-gradient(rgba(92,126,145,.06) 1px, transparent 1px), linear-gradient(90deg, rgba(92,126,145,.06) 1px, transparent 1px); background-size: 24px 24px; }
     .prose-content h2 { @apply mb-3 mt-8 text-xl font-black text-[#18221d]; }
     .prose-content p { @apply mb-5 leading-7 text-[#657066]; }
+    [data-theme="dark"] .bg-\[\#f2f5ef\], [data-theme="dev"] .bg-\[\#f2f5ef\] { background: #202c24; }
     [data-theme="dark"] .prose-content h2, [data-theme="dev"] .prose-content h2 { color: #edf4ea; }
     [data-theme="dark"] .prose-content p, [data-theme="dev"] .prose-content p { color: #a9b8ad; }
   }

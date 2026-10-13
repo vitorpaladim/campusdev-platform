@@ -50,6 +50,7 @@ const Navbar = ({ user, onLogout, theme, onThemeChange }) => {
               <>
                 <NavLink to="/dashboard" className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`}>Visão geral</NavLink>
                 <NavLink to="/projects" className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`}>Projetos</NavLink>
+                <NavLink to="/planos" className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`}>Planos</NavLink>
                 <NavLink to="/profile" className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`}>
                   <User className="h-4 w-4" /> {user.nomeCompleto?.split(' ')[0]}
                 </NavLink>
@@ -60,6 +61,7 @@ const Navbar = ({ user, onLogout, theme, onThemeChange }) => {
               </>
             ) : (
               <>
+                <Link to="/planos" className="nav-link">Planos</Link>
                 <Link to="/login" className="nav-link">Entrar</Link>
                 <Link to="/register" className="nav-cta">Criar conta <span>↗</span></Link>
               </>
