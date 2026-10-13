@@ -1,12 +1,11 @@
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Alert, AlertDescription } from '@/components/ui/alert'
 import { apiFetch } from '@/api/client'
-import { Code, Mail, Lock, AlertCircle } from 'lucide-react'
+import { ArrowLeft, ArrowUpRight, Code, Lock, Mail, AlertCircle } from 'lucide-react'
 
 const Login = ({ onLogin }) => {
   const [formData, setFormData] = useState({
@@ -61,95 +60,77 @@ const Login = ({ onLogin }) => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-md w-full space-y-8">
-        <div className="text-center">
-          <Link to="/" className="flex items-center justify-center space-x-2 mb-6">
-            <Code className="h-10 w-10 text-blue-600" />
-            <span className="text-2xl font-bold text-gray-900">UniProjects</span>
+    <main className="min-h-[calc(100vh-4rem)] border-b border-[#dfe5dc] px-6 py-12 lg:px-8 lg:py-20">
+      <div className="mx-auto grid max-w-6xl gap-12 lg:grid-cols-[.9fr_1.1fr] lg:items-center">
+        <div className="hidden lg:block">
+          <Link to="/" className="eyebrow inline-flex items-center gap-2 hover:text-[#18221d]">
+            <ArrowLeft className="h-4 w-4" /> Voltar para o início
           </Link>
-          <h2 className="text-3xl font-bold text-gray-900">
-            Entre na sua conta
-          </h2>
-          <p className="mt-2 text-gray-600">
-            Ou{' '}
-            <Link to="/register" className="text-blue-600 hover:text-blue-500">
-              crie uma conta gratuita
-            </Link>
+          <p className="eyebrow mt-20">De volta à construção</p>
+          <h1 className="display-title mt-5 max-w-lg text-6xl leading-[.95]">
+            Continue fazendo <span className="text-[#758e38]">acontecer.</span>
+          </h1>
+          <p className="mt-7 max-w-md text-lg leading-8 text-[#657066]">
+            Entre para acompanhar seus projetos, encontrar novas frentes e construir com outras pessoas.
           </p>
         </div>
 
-        <Card>
-          <CardHeader>
-            <CardTitle>Login</CardTitle>
-            <CardDescription>
-              Use seu email universitário para acessar sua conta
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <form onSubmit={handleSubmit} className="space-y-6">
+        <div className="mx-auto w-full max-w-xl">
+          <div className="soft-panel p-6 sm:p-10">
+            <div className="mb-8">
+              <Link to="/" className="mb-8 inline-flex items-center gap-2 lg:hidden">
+                <span className="brand-mark"><Code className="h-4 w-4" /></span>
+                <span className="brand-name">Campus<span>Dev</span></span>
+              </Link>
+              <p className="eyebrow">Acesso à comunidade</p>
+              <h2 className="display-title mt-3 text-4xl">Entre na sua conta.</h2>
+              <p className="mt-3 text-[#657066]">
+                Ainda não faz parte?{' '}
+                <Link to="/register" className="font-bold text-[#758e38] hover:text-[#18221d]">
+                  Crie seu perfil <ArrowUpRight className="inline h-4 w-4" />
+                </Link>
+              </p>
+            </div>
+
+            <form onSubmit={handleSubmit} className="space-y-5">
               {error && (
-                <Alert variant="destructive">
+                <Alert variant="destructive" className="border-red-200 bg-red-50">
                   <AlertCircle className="h-4 w-4" />
                   <AlertDescription>{error}</AlertDescription>
                 </Alert>
               )}
 
               <div className="space-y-2">
-                <Label htmlFor="email">Email Universitário</Label>
+                <Label htmlFor="email" className="font-bold text-[#18221d]">Email universitário</Label>
                 <div className="relative">
-                  <Mail className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
-                  <Input
-                    id="email"
-                    name="email"
-                    type="email"
-                    required
-                    className="pl-10"
-                    placeholder="seu.email@universidade.edu.br"
-                    value={formData.email}
-                    onChange={handleChange}
-                  />
+                  <Mail className="absolute left-3 top-3 h-4 w-4 text-[#758e38]" />
+                  <Input id="email" name="email" type="email" required className="h-12 rounded-xl border-[#dfe5dc] bg-[#f7f8f5] pl-10 focus-visible:ring-[#c8f169]" placeholder="voce@universidade.edu.br" value={formData.email} onChange={handleChange} />
                 </div>
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="senha">Senha</Label>
+                <Label htmlFor="senha" className="font-bold text-[#18221d]">Senha</Label>
                 <div className="relative">
-                  <Lock className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
-                  <Input
-                    id="senha"
-                    name="senha"
-                    type="password"
-                    required
-                    className="pl-10"
-                    placeholder="Sua senha"
-                    value={formData.senha}
-                    onChange={handleChange}
-                  />
+                  <Lock className="absolute left-3 top-3 h-4 w-4 text-[#758e38]" />
+                  <Input id="senha" name="senha" type="password" required className="h-12 rounded-xl border-[#dfe5dc] bg-[#f7f8f5] pl-10 focus-visible:ring-[#c8f169]" placeholder="Sua senha" value={formData.senha} onChange={handleChange} />
                 </div>
               </div>
 
               <Button
                 type="submit"
-                className="w-full"
+                className="h-12 w-full rounded-full bg-[#18221d] font-bold text-[#c8f169] hover:bg-[#2a3a2f]"
                 disabled={loading}
               >
                 {loading ? 'Entrando...' : 'Entrar'}
               </Button>
             </form>
-          </CardContent>
-        </Card>
-
-        <div className="text-center">
-          <p className="text-sm text-gray-600">
-            Esqueceu sua senha?{' '}
-            <a href="#" className="text-blue-600 hover:text-blue-500">
-              Recuperar senha
-            </a>
-          </p>
+            <p className="mt-6 text-center text-xs leading-5 text-[#657066]">
+              Ao entrar, você concorda com o uso responsável da plataforma e da comunidade.
+            </p>
+          </div>
         </div>
       </div>
-    </div>
+    </main>
   )
 }
 

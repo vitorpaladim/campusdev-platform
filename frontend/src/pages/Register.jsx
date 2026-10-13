@@ -1,12 +1,11 @@
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Alert, AlertDescription } from '@/components/ui/alert'
 import { Checkbox } from '@/components/ui/checkbox'
-import { Code, User, Mail, Lock, AlertCircle, CheckCircle } from 'lucide-react'
+import { ArrowLeft, ArrowUpRight, Code, User, Mail, Lock, AlertCircle, CheckCircle } from 'lucide-react'
 import { apiFetch } from '@/api/client'
 
 const Register = () => {
@@ -108,132 +107,95 @@ const Register = () => {
 
   if (success) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
-        <div className="max-w-md w-full">
-          <Card>
-            <CardContent className="pt-6">
-              <div className="text-center">
-                <CheckCircle className="h-16 w-16 text-green-600 mx-auto mb-4" />
-                <h2 className="text-2xl font-bold text-gray-900 mb-2">
-                  Conta criada com sucesso!
-                </h2>
-                <p className="text-gray-600 mb-4">
-                  Você será redirecionado para a página de login em alguns segundos.
-                </p>
-                <Link to="/login">
-                  <Button>Ir para Login</Button>
-                </Link>
-              </div>
-            </CardContent>
-          </Card>
+      <main className="flex min-h-[calc(100vh-4rem)] items-center justify-center border-b border-[#dfe5dc] px-6 py-12 lg:px-8">
+        <div className="soft-panel w-full max-w-xl p-8 text-center sm:p-12">
+          <CheckCircle className="mx-auto mb-5 h-16 w-16 text-[#758e38]" />
+          <p className="eyebrow">Bem-vindo à construção</p>
+          <h2 className="display-title mt-3 text-4xl">Perfil criado com sucesso.</h2>
+          <p className="mx-auto mt-4 max-w-md leading-7 text-[#657066]">
+            Você será encaminhado para o login em alguns segundos.
+          </p>
+          <Link to="/login" className="mt-8 inline-flex items-center gap-2 rounded-full bg-[#18221d] px-6 py-3.5 font-bold text-[#c8f169]">
+            Ir para o login <ArrowUpRight className="h-4 w-4" />
+          </Link>
         </div>
-      </div>
+      </main>
     )
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-md w-full space-y-8">
-        <div className="text-center">
-          <Link to="/" className="flex items-center justify-center space-x-2 mb-6">
-            <Code className="h-10 w-10 text-blue-600" />
-            <span className="text-2xl font-bold text-gray-900">UniProjects</span>
+    <main className="min-h-[calc(100vh-4rem)] border-b border-[#dfe5dc] px-6 py-12 lg:px-8 lg:py-20">
+      <div className="mx-auto grid max-w-6xl gap-12 lg:grid-cols-[.9fr_1.1fr] lg:items-center">
+        <div className="hidden lg:block">
+          <Link to="/" className="eyebrow inline-flex items-center gap-2 hover:text-[#18221d]">
+            <ArrowLeft className="h-4 w-4" /> Voltar para o início
           </Link>
-          <h2 className="text-3xl font-bold text-gray-900">
-            Crie sua conta
-          </h2>
-          <p className="mt-2 text-gray-600">
-            Ou{' '}
-            <Link to="/login" className="text-blue-600 hover:text-blue-500">
-              entre na sua conta existente
-            </Link>
+          <p className="eyebrow mt-20">Um espaço para construir junto</p>
+          <h1 className="display-title mt-5 max-w-lg text-6xl leading-[.95]">
+            Sua próxima ideia começa com <span className="text-[#758e38]">uma conexão.</span>
+          </h1>
+          <p className="mt-7 max-w-md text-lg leading-8 text-[#657066]">
+            Crie seu perfil, compartilhe o que sabe e encontre projetos em que sua contribuição faça diferença.
           </p>
         </div>
 
-        <Card>
-          <CardHeader>
-            <CardTitle>Cadastro</CardTitle>
-            <CardDescription>
-              Use seu email universitário para criar uma conta gratuita
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <form onSubmit={handleSubmit} className="space-y-6">
+        <div className="mx-auto w-full max-w-xl">
+          <div className="soft-panel p-6 sm:p-10">
+            <div className="mb-8">
+              <Link to="/" className="mb-8 inline-flex items-center gap-2 lg:hidden">
+                <span className="brand-mark"><Code className="h-4 w-4" /></span>
+                <span className="brand-name">Campus<span>Dev</span></span>
+              </Link>
+              <p className="eyebrow">Faça parte</p>
+              <h2 className="display-title mt-3 text-4xl">Crie seu perfil.</h2>
+              <p className="mt-3 text-[#657066]">
+                Já tem uma conta?{' '}
+                <Link to="/login" className="font-bold text-[#758e38] hover:text-[#18221d]">
+                  Entre aqui <ArrowUpRight className="inline h-4 w-4" />
+                </Link>
+              </p>
+            </div>
+
+            <form onSubmit={handleSubmit} className="space-y-5">
               {error && (
-                <Alert variant="destructive">
+                <Alert variant="destructive" className="border-red-200 bg-red-50">
                   <AlertCircle className="h-4 w-4" />
                   <AlertDescription>{error}</AlertDescription>
                 </Alert>
               )}
 
               <div className="space-y-2">
-                <Label htmlFor="nomeCompleto">Nome Completo</Label>
+                <Label htmlFor="nomeCompleto" className="font-bold text-[#18221d]">Nome completo</Label>
                 <div className="relative">
-                  <User className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
-                  <Input
-                    id="nomeCompleto"
-                    name="nomeCompleto"
-                    type="text"
-                    required
-                    className="pl-10"
-                    placeholder="Seu nome completo"
-                    value={formData.nomeCompleto}
-                    onChange={handleChange}
-                  />
+                  <User className="absolute left-3 top-3 h-4 w-4 text-[#758e38]" />
+                  <Input id="nomeCompleto" name="nomeCompleto" type="text" required className="h-12 rounded-xl border-[#dfe5dc] bg-[#f7f8f5] pl-10 focus-visible:ring-[#c8f169]" placeholder="Seu nome completo" value={formData.nomeCompleto} onChange={handleChange} />
                 </div>
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="email">Email Universitário</Label>
+                <Label htmlFor="email" className="font-bold text-[#18221d]">Email universitário</Label>
                 <div className="relative">
-                  <Mail className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
-                  <Input
-                    id="email"
-                    name="email"
-                    type="email"
-                    required
-                    className="pl-10"
-                    placeholder="seu.email@universidade.edu.br"
-                    value={formData.email}
-                    onChange={handleChange}
-                  />
+                  <Mail className="absolute left-3 top-3 h-4 w-4 text-[#758e38]" />
+                  <Input id="email" name="email" type="email" required className="h-12 rounded-xl border-[#dfe5dc] bg-[#f7f8f5] pl-10 focus-visible:ring-[#c8f169]" placeholder="voce@universidade.edu.br" value={formData.email} onChange={handleChange} />
                 </div>
-                <p className="text-xs text-gray-500">
-                  Apenas emails universitários (.edu.br ou .edu) são aceitos
+                <p className="text-xs text-[#657066]">
+                  Aceitamos emails universitários (.edu.br ou .edu).
                 </p>
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="senha">Senha</Label>
+                <Label htmlFor="senha" className="font-bold text-[#18221d]">Senha</Label>
                 <div className="relative">
-                  <Lock className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
-                  <Input
-                    id="senha"
-                    name="senha"
-                    type="password"
-                    required
-                    className="pl-10"
-                    placeholder="Mínimo 6 caracteres"
-                    value={formData.senha}
-                    onChange={handleChange}
-                  />
+                  <Lock className="absolute left-3 top-3 h-4 w-4 text-[#758e38]" />
+                  <Input id="senha" name="senha" type="password" required className="h-12 rounded-xl border-[#dfe5dc] bg-[#f7f8f5] pl-10 focus-visible:ring-[#c8f169]" placeholder="Mínimo 6 caracteres" value={formData.senha} onChange={handleChange} />
                 </div>
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="confirmarSenha">Confirmar Senha</Label>
+                <Label htmlFor="confirmarSenha" className="font-bold text-[#18221d]">Confirmar senha</Label>
                 <div className="relative">
-                  <Lock className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
-                  <Input
-                    id="confirmarSenha"
-                    name="confirmarSenha"
-                    type="password"
-                    required
-                    className="pl-10"
-                    placeholder="Confirme sua senha"
-                    value={formData.confirmarSenha}
-                    onChange={handleChange}
-                  />
+                  <Lock className="absolute left-3 top-3 h-4 w-4 text-[#758e38]" />
+                  <Input id="confirmarSenha" name="confirmarSenha" type="password" required className="h-12 rounded-xl border-[#dfe5dc] bg-[#f7f8f5] pl-10 focus-visible:ring-[#c8f169]" placeholder="Repita sua senha" value={formData.confirmarSenha} onChange={handleChange} />
                 </div>
               </div>
 
@@ -246,37 +208,26 @@ const Register = () => {
                     setFormData({ ...formData, aceitarTermos: checked })
                   }
                 />
-                <Label htmlFor="aceitarTermos" className="text-sm">
-                  Aceito os{' '}
-                  <a href="#" className="text-blue-600 hover:text-blue-500">
-                    termos de uso
-                  </a>{' '}
-                  e{' '}
-                  <a href="#" className="text-blue-600 hover:text-blue-500">
-                    política de privacidade
-                  </a>
+                <Label htmlFor="aceitarTermos" className="text-sm leading-5 text-[#657066]">
+                  Aceito os termos de uso e a política de privacidade.
                 </Label>
               </div>
 
               <Button
                 type="submit"
-                className="w-full"
+                className="h-12 w-full rounded-full bg-[#18221d] font-bold text-[#c8f169] hover:bg-[#2a3a2f]"
                 disabled={loading}
               >
                 {loading ? 'Criando conta...' : 'Criar Conta'}
               </Button>
             </form>
-          </CardContent>
-        </Card>
-
-        <div className="text-center">
-          <p className="text-xs text-gray-500">
-            Ao criar uma conta, você concorda com nossa coleta mínima de dados
-            conforme a LGPD e pode editar ou excluir sua conta a qualquer momento.
-          </p>
+            <p className="mt-6 text-center text-xs leading-5 text-[#657066]">
+              Seus dados são usados apenas para viabilizar sua participação na comunidade.
+            </p>
+          </div>
         </div>
       </div>
-    </div>
+    </main>
   )
 }
 
