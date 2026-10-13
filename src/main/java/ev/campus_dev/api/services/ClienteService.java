@@ -45,6 +45,9 @@ public class ClienteService {
     public Optional<Cliente> atualizar(Long id, Cliente dados) {
         return clienteRepository.findById(id)
                 .map(existente -> {
+                    if (dados.getNomeCompleto() != null) {
+                        existente.setNomeCompleto(dados.getNomeCompleto());
+                    }
                     existente.setTipoDeMercado(dados.getTipoDeMercado());
                     existente.setNomeEmpresa(dados.getNomeEmpresa());
                     existente.setTelefone(dados.getTelefone());

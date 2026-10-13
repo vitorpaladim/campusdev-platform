@@ -14,6 +14,9 @@ const Profile = ({ user }) => {
   const navigate = useNavigate()
   const [profileData, setProfileData] = useState({
     nomeCompleto: user?.nomeCompleto || '',
+    tipoDeMercado: user?.tipoDeMercado || '',
+    nomeEmpresa: user?.nomeEmpresa || '',
+    telefone: user?.telefone || '',
     bio: user?.bio || '',
     disponibilidade: user?.disponibilidade || 'DISPONIVEL',
     portfolioUrl: user?.portfolioUrl || '',
@@ -21,6 +24,7 @@ const Profile = ({ user }) => {
     semestre: user?.semestre || '',
     skills: Array.isArray(user?.skills) ? user.skills : (user?.skills || '').split(',').map((skill) => skill.trim()).filter(Boolean)
   })
+  const isClient = user?.role === 'CLIENTE'
   const [newSkill, setNewSkill] = useState('')
   const [loading, setLoading] = useState(false)
   const [deleteLoading, setDeleteLoading] = useState(false)
@@ -32,6 +36,9 @@ const Profile = ({ user }) => {
     if (user) {
       setProfileData({
         nomeCompleto: user.nomeCompleto || '',
+        tipoDeMercado: user.tipoDeMercado || '',
+        nomeEmpresa: user.nomeEmpresa || '',
+        telefone: user.telefone || '',
         bio: user.bio || '',
         disponibilidade: user.disponibilidade || 'DISPONIVEL',
         portfolioUrl: user.portfolioUrl || '',
@@ -74,21 +81,31 @@ const Profile = ({ user }) => {
     setSuccess('')
 
     try {
-      const response = await apiFetch(`/desenvolvedores/${user.id}`, {
+      const endpoint = isClient ? `/clientes/${user.id}` : `/desenvolvedores/${user.id}`
+      const body = isClient
+        ? {
+            nomeCompleto: profileData.nomeCompleto,
+            tipoDeMercado: profileData.tipoDeMercado,
+            nomeEmpresa: profileData.nomeEmpresa,
+            telefone: profileData.telefone,
+          }
+        : {
+            nomeCompleto: profileData.nomeCompleto,
+            email: user.email,
+            bio: profileData.bio,
+            disponibilidade: profileData.disponibilidade,
+            portfolioUrl: profileData.portfolioUrl,
+            curso: profileData.curso,
+            semestre: String(profileData.semestre || ''),
+            skills: profileData.skills.join(', '),
+          }
+
+      const response = await apiFetch(endpoint, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({
-          nomeCompleto: profileData.nomeCompleto,
-          email: user.email,
-          bio: profileData.bio,
-          disponibilidade: profileData.disponibilidade,
-          portfolioUrl: profileData.portfolioUrl,
-          curso: profileData.curso,
-          semestre: String(profileData.semestre || ''),
-          skills: profileData.skills.join(', '),
-        }),
+        body: JSON.stringify(body),
       })
 
       const data = await response.json()
@@ -97,7 +114,9 @@ const Profile = ({ user }) => {
         setSuccess('Perfil atualizado com sucesso!')
 
         // Atualizar dados do usuário no localStorage
-        const updatedUser = { ...user, ...profileData }
+        const updatedUser = isClient
+          ? { ...user, tipoDeMercado: profileData.tipoDeMercado, nomeEmpresa: profileData.nomeEmpresa, telefone: profileData.telefone }
+          : { ...user, ...profileData }
         localStorage.setItem('user', JSON.stringify(updatedUser))
 
         // Limpar mensagem de sucesso após 3 segundos
@@ -117,7 +136,8 @@ const Profile = ({ user }) => {
     setError('')
 
     try {
-      const response = await apiFetch(`/usuarios/${user.id}`, {
+      const endpoint = isClient ? `/clientes/${user.id}` : `/desenvolvedores/${user.id}`
+      const response = await apiFetch(endpoint, {
         method: 'DELETE',
       })
 
@@ -202,20 +222,37 @@ const Profile = ({ user }) => {
                   </p>
                 </div>
 
-                <div className="space-y-2">
-                  <Label htmlFor="bio">Sobre você</Label>
-                  <textarea
-                    id="bio"
-                    name="bio"
-                    value={profileData.bio}
-                    onChange={handleInputChange}
-                    placeholder="Conte brevemente o que você faz e que tipo de projeto procura."
-                    rows={4}
-                    className="flex w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-                  />
-                </div>
+                {isClient ? (
+                  <div className="space-y-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="nomeEmpresa">Nome da empresa ou negócio</Label>
+                      <Input id="nomeEmpresa" name="nomeEmpresa" value={profileData.nomeEmpresa} onChange={handleInputChange} placeholder="Ex: Studio XPTO" />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="tipoDeMercado">Tipo de mercado</Label>
+                      <Input id="tipoDeMercado" name="tipoDeMercado" value={profileData.tipoDeMercado} onChange={handleInputChange} placeholder="Ex: pequeno negócio, empresa ou pessoa" />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="telefone">Telefone</Label>
+                      <Input id="telefone" name="telefone" value={profileData.telefone} onChange={handleInputChange} placeholder="(00) 00000-0000" />
+                    </div>
+                  </div>
+                ) : (
+                  <>
+                    <div className="space-y-2">
+                      <Label htmlFor="bio">Sobre você</Label>
+                      <textarea
+                        id="bio"
+                        name="bio"
+                        value={profileData.bio}
+                        onChange={handleInputChange}
+                        placeholder="Conte brevemente o que você faz e que tipo de projeto procura."
+                        rows={4}
+                        className="flex w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                      />
+                    </div>
 
-                <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+                    <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                   <div className="space-y-2">
                     <Label htmlFor="disponibilidade">Disponibilidade</Label>
                     <select id="disponibilidade" name="disponibilidade" value={profileData.disponibilidade} onChange={handleInputChange} className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm">
@@ -228,9 +265,9 @@ const Profile = ({ user }) => {
                     <Label htmlFor="portfolioUrl">Link do portfólio ou último projeto</Label>
                     <Input id="portfolioUrl" name="portfolioUrl" type="url" value={profileData.portfolioUrl} onChange={handleInputChange} placeholder="https://github.com/seu-usuario" />
                   </div>
-                </div>
+                    </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div className="space-y-2">
                     <Label htmlFor="curso">Formação ou área</Label>
                     <Input
@@ -240,9 +277,9 @@ const Profile = ({ user }) => {
                       onChange={handleInputChange}
                       placeholder="Ex: Ciência da Computação"
                     />
-                  </div>
+                    </div>
 
-                  <div className="space-y-2">
+                    <div className="space-y-2">
                     <Label htmlFor="semestre">Experiência (anos)</Label>
                     <Input
                       id="semestre"
@@ -254,9 +291,10 @@ const Profile = ({ user }) => {
                       onChange={handleInputChange}
                       placeholder="Ex: 5"
                     />
-                  </div>
+                    </div>
+                    </div>
 
-                  {profileData.bio && (
+                    {profileData.bio && (
                     <div className="flex items-start space-x-3">
                       <div className="bg-lime-100 p-2 rounded-full">
                         <User className="h-5 w-5 text-[#758e38]" />
@@ -273,9 +311,10 @@ const Profile = ({ user }) => {
                       <ExternalLink className="h-4 w-4" /> Ver portfólio
                     </a>
                   )}
-                </div>
+                  </>
+                )}
 
-                <div className="space-y-2">
+                {!isClient && <div className="space-y-2">
                   <Label>Habilidades</Label>
                   <div className="flex space-x-2">
                     <Input
@@ -289,7 +328,7 @@ const Profile = ({ user }) => {
                     </Button>
                   </div>
 
-                  {profileData.skills.length > 0 && (
+                  {!isClient && profileData.skills.length > 0 && (
                     <div className="flex flex-wrap gap-2 mt-3">
                       {profileData.skills.map((skill, index) => (
                         <Badge key={index} variant="secondary" className="flex items-center space-x-1">
@@ -306,6 +345,7 @@ const Profile = ({ user }) => {
                     </div>
                   )}
                 </div>
+                }
 
                 <div className="flex justify-end">
                   <Button type="submit" disabled={loading}>
