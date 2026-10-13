@@ -86,7 +86,7 @@ const Dashboard = ({ user }) => {
           Bem-vindo, {user.nomeCompleto}!
         </h1>
         <p className="text-gray-600">
-          Gerencie seus projetos e colabore com outros estudantes
+          Acompanhe seus projetos, oportunidades e conexões
         </p>
       </div>
 

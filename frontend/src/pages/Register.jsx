@@ -14,6 +14,7 @@ const Register = () => {
     email: '',
     senha: '',
     confirmarSenha: '',
+    tipoPerfil: 'OFERECO_SERVICOS',
     aceitarTermos: false
   })
   const [loading, setLoading] = useState(false)
@@ -36,14 +37,7 @@ const Register = () => {
     }
 
     if (!formData.email.trim()) {
-      setError('Email universitário é obrigatório')
-      return false
-    }
-
-    // Validar email universitário
-    const emailPattern = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.(edu\.br|edu)$/
-    if (!emailPattern.test(formData.email)) {
-      setError('Email deve ser de uma universidade (.edu.br ou .edu)')
+      setError('Email é obrigatório')
       return false
     }
 
@@ -84,7 +78,8 @@ const Register = () => {
         body: JSON.stringify({
           nomeCompleto: formData.nomeCompleto,
           email: formData.email,
-          senha: formData.senha
+          senha: formData.senha,
+          tipoPerfil: formData.tipoPerfil
         }),
       })
 
@@ -174,15 +169,26 @@ const Register = () => {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="email" className="font-bold text-[#18221d]">Email universitário</Label>
+                <Label htmlFor="email" className="font-bold text-[#18221d]">Email</Label>
                 <div className="relative">
                   <Mail className="absolute left-3 top-3 h-4 w-4 text-[#758e38]" />
-                  <Input id="email" name="email" type="email" required className="h-12 rounded-xl border-[#dfe5dc] bg-[#f7f8f5] pl-10 focus-visible:ring-[#c8f169]" placeholder="voce@universidade.edu.br" value={formData.email} onChange={handleChange} />
+                  <Input id="email" name="email" type="email" required className="h-12 rounded-xl border-[#dfe5dc] bg-[#f7f8f5] pl-10 focus-visible:ring-[#c8f169]" placeholder="voce@email.com" value={formData.email} onChange={handleChange} />
                 </div>
-                <p className="text-xs text-[#657066]">
-                  Aceitamos emails universitários (.edu.br ou .edu).
-                </p>
               </div>
+
+              <fieldset className="space-y-3">
+                <legend className="font-bold text-[#18221d]">Como você quer usar o CampusDev?</legend>
+                <label className={`block cursor-pointer rounded-2xl border p-4 transition-colors ${formData.tipoPerfil === 'OFERECO_SERVICOS' ? 'border-[#758e38] bg-[#f2f5ef]' : 'border-[#dfe5dc]'}`}>
+                  <input className="sr-only" type="radio" name="tipoPerfil" value="OFERECO_SERVICOS" checked={formData.tipoPerfil === 'OFERECO_SERVICOS'} onChange={handleChange} />
+                  <span className="font-bold text-[#18221d]">Estou livre para trabalhar</span>
+                  <span className="mt-1 block text-sm text-[#657066]">Quero oferecer minhas habilidades e participar de projetos.</span>
+                </label>
+                <label className={`block cursor-pointer rounded-2xl border p-4 transition-colors ${formData.tipoPerfil === 'PROCURO_SERVICO' ? 'border-[#758e38] bg-[#f2f5ef]' : 'border-[#dfe5dc]'}`}>
+                  <input className="sr-only" type="radio" name="tipoPerfil" value="PROCURO_SERVICO" checked={formData.tipoPerfil === 'PROCURO_SERVICO'} onChange={handleChange} />
+                  <span className="font-bold text-[#18221d]">Preciso de um projeto</span>
+                  <span className="mt-1 block text-sm text-[#657066]">Quero encontrar pessoas para criar um site, produto ou serviço.</span>
+                </label>
+              </fieldset>
 
               <div className="space-y-2">
                 <Label htmlFor="senha" className="font-bold text-[#18221d]">Senha</Label>

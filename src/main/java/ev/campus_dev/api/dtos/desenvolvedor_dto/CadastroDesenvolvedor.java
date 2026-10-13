@@ -16,6 +16,8 @@ public record CadastroDesenvolvedor(
         @Size(min = 6, message = "A senha deve ter no mínimo 6 caracteres")
         String senha,
 
+        String tipoPerfil,
+
         // Campos que podem ser nulos no cadastro e preenchidos depois no perfil
         String curso,
         String semestre,
@@ -41,4 +43,3 @@ public record CadastroDesenvolvedor(
 //        String skills,
 //        @NotBlank
 //        LocalDateTime dataDeCadastro
-

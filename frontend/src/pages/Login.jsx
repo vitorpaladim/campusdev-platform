@@ -102,10 +102,10 @@ const Login = ({ onLogin }) => {
               )}
 
               <div className="space-y-2">
-                <Label htmlFor="email" className="font-bold text-[#18221d]">Email universitário</Label>
+                <Label htmlFor="email" className="font-bold text-[#18221d]">Email</Label>
                 <div className="relative">
                   <Mail className="absolute left-3 top-3 h-4 w-4 text-[#758e38]" />
-                  <Input id="email" name="email" type="email" required className="h-12 rounded-xl border-[#dfe5dc] bg-[#f7f8f5] pl-10 focus-visible:ring-[#c8f169]" placeholder="voce@universidade.edu.br" value={formData.email} onChange={handleChange} />
+                  <Input id="email" name="email" type="email" required className="h-12 rounded-xl border-[#dfe5dc] bg-[#f7f8f5] pl-10 focus-visible:ring-[#c8f169]" placeholder="voce@email.com" value={formData.email} onChange={handleChange} />
                 </div>
               </div>
 

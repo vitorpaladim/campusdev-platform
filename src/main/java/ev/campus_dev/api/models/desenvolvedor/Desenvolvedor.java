@@ -25,6 +25,8 @@ public class Desenvolvedor extends ev.campus_dev.api.models.usuario.Usuario {
     private String curso;
     private String semestre;
     private String skills;
+    @Column(name = "tipo_perfil")
+    private String tipoPerfil;
     @Column(name = "data_cadastro")
     private LocalDateTime dataDeCadastro;
 

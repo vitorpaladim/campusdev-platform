@@ -92,6 +92,7 @@ public class AuthenticationController {
         novoDev.setCurso(dados.curso()); // Pode ser nulo
         novoDev.setSemestre(dados.semestre()); // Pode ser nulo
         novoDev.setSkills(dados.skills()); // Pode ser nulo
+        novoDev.setTipoPerfil(dados.tipoPerfil());
         novoDev.setDataDeCadastro(LocalDateTime.now());
         desenvolvedorRepository.save(novoDev);
 

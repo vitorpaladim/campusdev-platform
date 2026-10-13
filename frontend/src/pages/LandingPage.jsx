@@ -17,7 +17,7 @@ const LandingPage = () => (
             Ideias boas ficam melhores <span className="text-[#758e38]">em equipe.</span>
           </h1>
           <p className="mt-8 max-w-xl text-lg leading-8 text-[#657066]">
-            O CampusDev aproxima estudantes de tecnologia e projetos que merecem sair do papel — com clareza, colaboração e espaço para aprender.
+            O CampusDev conecta quem tem uma habilidade a quem precisa tirar um projeto do papel — com clareza, colaboração e oportunidades reais.
           </p>
           <div className="mt-10 flex flex-wrap items-center gap-4">
             <Link to="/register" className="inline-flex items-center gap-3 rounded-full bg-[#18221d] px-6 py-3.5 font-bold text-[#c8f169] transition-transform hover:-translate-y-0.5">
@@ -60,7 +60,7 @@ const LandingPage = () => (
 
     <section className="mx-auto max-w-7xl px-6 py-24 lg:px-8">
       <div className="grid gap-12 lg:grid-cols-[.7fr_1.3fr]">
-        <div><p className="eyebrow mb-4">Sem complicação</p><h2 className="display-title text-4xl sm:text-5xl">Menos vitrine.<br /><span className="text-[#758e38]">Mais prática.</span></h2></div>
+        <div>        <p className="eyebrow mb-4">Dois lados, uma rede</p><h2 className="display-title text-4xl sm:text-5xl">Quem oferece.<br /><span className="text-[#758e38]">Quem precisa.</span></h2></div>
         <div className="grid gap-4 md:grid-cols-3">
           {steps.map(([number, title, text]) => <article key={number} className="soft-panel p-6">
             <span className="text-sm font-black text-[#9bad8f]">{number}</span>
