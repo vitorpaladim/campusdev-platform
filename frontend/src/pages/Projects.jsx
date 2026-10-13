@@ -19,6 +19,8 @@ const Projects = ({ user, token }) => {
   const [error, setError] = useState('')
   const [searchTerm, setSearchTerm] = useState('')
   const [statusFilter, setStatusFilter] = useState('all')
+  const [categoryFilter, setCategoryFilter] = useState('all')
+  const [maxBudget, setMaxBudget] = useState('')
   const [showCreateDialog, setShowCreateDialog] = useState(false)
   const [createLoading, setCreateLoading] = useState(false)
   const [createError, setCreateError] = useState('')
@@ -196,9 +198,13 @@ const Projects = ({ user, token }) => {
                          (project.categoria || '').toLowerCase().includes(searchTerm.toLowerCase())
 
     const matchesStatus = statusFilter === 'all' || project.status === statusFilter
+    const matchesCategory = categoryFilter === 'all' || project.categoria === categoryFilter
+    const matchesBudget = !maxBudget || (project.orcamento != null && Number(project.orcamento) <= Number(maxBudget))
 
-    return matchesSearch && matchesStatus
+    return matchesSearch && matchesStatus && matchesCategory && matchesBudget
   })
+
+  const categories = [...new Set(projects.map((project) => project.categoria).filter(Boolean))]
 
   const getStatusColor = (status) => {
     switch (status) {
@@ -383,7 +389,8 @@ const Projects = ({ user, token }) => {
       </div>
 
       {/* Filters */}
-      <div className="flex flex-col md:flex-row gap-4 mb-6">
+      <div className="flex flex-col gap-4 mb-6">
+        <div className="flex flex-col md:flex-row gap-4">
         <div className="relative flex-1">
           <Search className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
           <Input
@@ -407,6 +414,33 @@ const Projects = ({ user, token }) => {
             <SelectItem value="CANCELADO">Cancelado</SelectItem>
           </SelectContent>
         </Select>
+        </div>
+        <div className="flex flex-col md:flex-row gap-4">
+          <Select value={categoryFilter} onValueChange={setCategoryFilter}>
+            <SelectTrigger className="w-full md:w-64">
+              <Filter className="h-4 w-4 mr-2" />
+              <SelectValue placeholder="Filtrar por categoria" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">Todas as categorias</SelectItem>
+              {categories.map((category) => <SelectItem key={category} value={category}>{category}</SelectItem>)}
+            </SelectContent>
+          </Select>
+          <Input
+            type="number"
+            min="0"
+            step="0.01"
+            value={maxBudget}
+            onChange={(e) => setMaxBudget(e.target.value)}
+            placeholder="Orçamento máximo (R$)"
+            className="w-full md:w-64"
+          />
+          {(categoryFilter !== 'all' || maxBudget) && (
+            <Button type="button" variant="outline" onClick={() => { setCategoryFilter('all'); setMaxBudget('') }}>
+              Limpar filtros
+            </Button>
+          )}
+        </div>
       </div>
 
       {/* Projects Grid */}
@@ -421,7 +455,7 @@ const Projects = ({ user, token }) => {
             <div className="text-center text-gray-500">
               <Code className="h-12 w-12 mx-auto mb-4 text-gray-300" />
               <p className="mb-4">
-                {searchTerm || statusFilter !== 'all'
+                {searchTerm || statusFilter !== 'all' || categoryFilter !== 'all' || maxBudget
                   ? 'Nenhum projeto encontrado com os filtros aplicados'
                   : 'Nenhum projeto disponível no momento'
                 }
