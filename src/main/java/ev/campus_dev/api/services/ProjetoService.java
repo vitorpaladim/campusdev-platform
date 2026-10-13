@@ -38,7 +38,7 @@ public class ProjetoService {
     }
 
     public List<Projeto> listar() {
-        return projetoRepository.findAll();
+        return projetoRepository.findAllByOrderByDestaqueDescDataDeCadastroDesc();
     }
 
     public Optional<Projeto> buscar(Long id) {
