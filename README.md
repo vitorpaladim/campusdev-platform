@@ -43,6 +43,11 @@ O projeto usa PostgreSQL. Crie o banco `campus_dev` e forneça as credenciais
 nas variáveis de ambiente; o Flyway executa as migrations PostgreSQL
 automaticamente ao iniciar.
 
+No Supabase, não é necessário criar tabelas manualmente quando o backend
+estiver conectado ao Render: o Flyway executa as migrations automaticamente.
+Se precisar criar o schema pelo painel do Supabase, execute o arquivo
+`supabase/schema.sql` no **SQL Editor**.
+
 Frontend:
 
 ```bash
