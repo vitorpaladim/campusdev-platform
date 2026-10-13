@@ -123,13 +123,7 @@ const Projects = ({ user, token }) => {
     }
   }
 
-  const handleJoinProject = async (projectId) => {
-    if (!user) {
-      alert('Você precisa estar logado para participar de um projeto')
-      return
-    }
-
-    const openChat = async (project) => {
+  const openChat = async (project) => {
       setChatProject(project)
       setMessages([])
       setChatError('')
@@ -146,9 +140,9 @@ const Projects = ({ user, token }) => {
       } finally {
         setChatLoading(false)
       }
-    }
+  }
 
-    const sendMessage = async (event) => {
+  const sendMessage = async (event) => {
       event.preventDefault()
       if (!chatProject || !messageText.trim()) return
       setChatLoading(true)
@@ -167,6 +161,12 @@ const Projects = ({ user, token }) => {
       } finally {
         setChatLoading(false)
       }
+  }
+
+  const handleJoinProject = async (projectId) => {
+    if (!user) {
+      alert('Você precisa estar logado para participar de um projeto')
+      return
     }
 
     try {
