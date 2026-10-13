@@ -19,6 +19,9 @@ public record CadastroDesenvolvedor(
         String tipoPerfil,
 
         // Campos que podem ser nulos no cadastro e preenchidos depois no perfil
+        String bio,
+        String disponibilidade,
+        String portfolioUrl,
         String curso,
         String semestre,
         String skills

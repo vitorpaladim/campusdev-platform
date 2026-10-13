@@ -42,6 +42,9 @@ public class DesenvolvedorService {
         dev.setSemestre(dados.semestre());
         dev.setSkills(dados.skills());
         dev.setTipoPerfil(dados.tipoPerfil());
+        dev.setBio(dados.bio());
+        dev.setDisponibilidade(dados.disponibilidade());
+        dev.setPortfolioUrl(dados.portfolioUrl());
         return new ListagemDesenvolvedor(desenvolvedorRepository.save(dev));
     }
 

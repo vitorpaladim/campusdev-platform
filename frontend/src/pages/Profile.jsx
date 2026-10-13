@@ -7,16 +7,19 @@ import { Label } from '@/components/ui/label'
 import { Badge } from '@/components/ui/badge'
 import { Alert, AlertDescription } from '@/components/ui/alert'
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
-import { User, Mail, BookOpen, Code, Plus, X, Save, Trash2, AlertCircle, CheckCircle } from 'lucide-react'
+import { User, Mail, BookOpen, Code, Plus, X, Save, Trash2, AlertCircle, CheckCircle, ExternalLink } from 'lucide-react'
 import { apiFetch } from '@/api/client'
 
 const Profile = ({ user }) => {
   const navigate = useNavigate()
   const [profileData, setProfileData] = useState({
     nomeCompleto: user?.nomeCompleto || '',
+    bio: user?.bio || '',
+    disponibilidade: user?.disponibilidade || 'DISPONIVEL',
+    portfolioUrl: user?.portfolioUrl || '',
     curso: user?.curso || '',
     semestre: user?.semestre || '',
-    skills: user?.skills || []
+    skills: Array.isArray(user?.skills) ? user.skills : (user?.skills || '').split(',').map((skill) => skill.trim()).filter(Boolean)
   })
   const [newSkill, setNewSkill] = useState('')
   const [loading, setLoading] = useState(false)
@@ -29,9 +32,12 @@ const Profile = ({ user }) => {
     if (user) {
       setProfileData({
         nomeCompleto: user.nomeCompleto || '',
+        bio: user.bio || '',
+        disponibilidade: user.disponibilidade || 'DISPONIVEL',
+        portfolioUrl: user.portfolioUrl || '',
         curso: user.curso || '',
         semestre: user.semestre || '',
-        skills: user.skills || []
+        skills: Array.isArray(user.skills) ? user.skills : (user.skills || '').split(',').map((skill) => skill.trim()).filter(Boolean)
       })
     }
   }, [user])
@@ -68,7 +74,7 @@ const Profile = ({ user }) => {
     setSuccess('')
 
     try {
-      const response = await apiFetch(`/usuarios/${user.id}`, {
+      const response = await apiFetch(`/desenvolvedores/${user.id}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -76,7 +82,12 @@ const Profile = ({ user }) => {
         body: JSON.stringify({
           nomeCompleto: profileData.nomeCompleto,
           email: user.email,
-          role: user.role,
+          bio: profileData.bio,
+          disponibilidade: profileData.disponibilidade,
+          portfolioUrl: profileData.portfolioUrl,
+          curso: profileData.curso,
+          semestre: String(profileData.semestre || ''),
+          skills: profileData.skills.join(', '),
         }),
       })
 
@@ -179,7 +190,7 @@ const Profile = ({ user }) => {
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="emailUniversitario">Email Universitário</Label>
+                  <Label htmlFor="emailUniversitario">Email</Label>
                   <Input
                     id="emailUniversitario"
                     value={user?.email || ''}
@@ -187,13 +198,41 @@ const Profile = ({ user }) => {
                     className="bg-gray-50"
                   />
                   <p className="text-xs text-gray-500">
-                    O email não pode ser alterado
+                    O email não pode ser alterado.
                   </p>
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="bio">Sobre você</Label>
+                  <textarea
+                    id="bio"
+                    name="bio"
+                    value={profileData.bio}
+                    onChange={handleInputChange}
+                    placeholder="Conte brevemente o que você faz e que tipo de projeto procura."
+                    rows={4}
+                    className="flex w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                  />
+                </div>
+
+                <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+                  <div className="space-y-2">
+                    <Label htmlFor="disponibilidade">Disponibilidade</Label>
+                    <select id="disponibilidade" name="disponibilidade" value={profileData.disponibilidade} onChange={handleInputChange} className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm">
+                      <option value="DISPONIVEL">Estou livre para projetos</option>
+                      <option value="OCUPADO">Estou ocupado no momento</option>
+                      <option value="PARCIAL">Tenho disponibilidade parcial</option>
+                    </select>
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="portfolioUrl">Link do portfólio ou último projeto</Label>
+                    <Input id="portfolioUrl" name="portfolioUrl" type="url" value={profileData.portfolioUrl} onChange={handleInputChange} placeholder="https://github.com/seu-usuario" />
+                  </div>
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div className="space-y-2">
-                    <Label htmlFor="curso">Curso</Label>
+                    <Label htmlFor="curso">Formação ou área</Label>
                     <Input
                       id="curso"
                       name="curso"
@@ -204,18 +243,36 @@ const Profile = ({ user }) => {
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="semestre">Semestre</Label>
+                    <Label htmlFor="semestre">Experiência (anos)</Label>
                     <Input
                       id="semestre"
                       name="semestre"
                       type="number"
                       min="1"
-                      max="20"
+                      max="60"
                       value={profileData.semestre}
                       onChange={handleInputChange}
                       placeholder="Ex: 5"
                     />
                   </div>
+
+                  {profileData.bio && (
+                    <div className="flex items-start space-x-3">
+                      <div className="bg-lime-100 p-2 rounded-full">
+                        <User className="h-5 w-5 text-[#758e38]" />
+                      </div>
+                      <div>
+                        <p className="text-sm leading-6 text-gray-600">{profileData.bio}</p>
+                        <p className="text-sm text-gray-500">Sobre</p>
+                      </div>
+                    </div>
+                  )}
+
+                  {profileData.portfolioUrl && (
+                    <a href={profileData.portfolioUrl} target="_blank" rel="noreferrer" className="flex items-center gap-2 text-sm font-semibold text-[#758e38] hover:text-[#18221d]">
+                      <ExternalLink className="h-4 w-4" /> Ver portfólio
+                    </a>
+                  )}
                 </div>
 
                 <div className="space-y-2">
