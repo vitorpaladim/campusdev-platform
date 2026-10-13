@@ -1,6 +1,10 @@
 {
   "rewrites": [
     {
+      "source": "/api-proxy/:path*",
+      "destination": "https://campus-dev-api-teste.onrender.com/:path*"
+    },
+    {
       "source": "/(.*)",
       "destination": "/index.html"
     }

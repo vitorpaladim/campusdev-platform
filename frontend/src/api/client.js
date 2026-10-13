@@ -1,4 +1,8 @@
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://campus-dev-api-teste.onrender.com'
+const isVercelDeployment = typeof window !== 'undefined'
+  && window.location.hostname.endsWith('.vercel.app')
+const API_BASE_URL = isVercelDeployment
+  ? '/api-proxy'
+  : (import.meta.env.VITE_API_URL || 'https://campus-dev-api-teste.onrender.com')
 
 export async function apiFetch(path, options = {}) {
   const token = localStorage.getItem('token')
