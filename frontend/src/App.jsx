@@ -13,6 +13,12 @@ function App() {
   const [user, setUser] = useState(null)
   const [token, setToken] = useState(null)
   const [loading, setLoading] = useState(true)
+  const [theme, setTheme] = useState(() => localStorage.getItem('campusdev-theme') || 'light')
+
+  useEffect(() => {
+    localStorage.setItem('campusdev-theme', theme)
+    document.documentElement.dataset.theme = theme
+  }, [theme])
 
   useEffect(() => {
     // Verificar se há token salvo no localStorage
@@ -66,8 +72,8 @@ function App() {
 
   return (
     <Router>
-      <div className="min-h-screen bg-gray-50">
-        <Navbar user={user} onLogout={handleLogout} />
+      <div className={`app-shell theme-${theme}`}>
+        <Navbar user={user} onLogout={handleLogout} theme={theme} onThemeChange={setTheme} />
 
         <Routes>
           <Route path="/" element={<LandingPage />} />

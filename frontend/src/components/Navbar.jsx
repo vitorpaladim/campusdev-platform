@@ -1,9 +1,9 @@
 import { useState } from 'react'
 import { Link, NavLink, useNavigate } from 'react-router-dom'
 import { Button } from '@/components/ui/button'
-import { Menu, X, Code, LogOut, User } from 'lucide-react'
+import { Menu, X, Code, LogOut, User, Sun, Moon, Terminal } from 'lucide-react'
 
-const Navbar = ({ user, onLogout }) => {
+const Navbar = ({ user, onLogout, theme, onThemeChange }) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const navigate = useNavigate()
 
@@ -11,6 +11,12 @@ const Navbar = ({ user, onLogout }) => {
     onLogout()
     navigate('/')
   }
+
+  const themes = [
+    { id: 'light', label: 'Claro', icon: Sun },
+    { id: 'dark', label: 'Escuro', icon: Moon },
+    { id: 'dev', label: 'Dev', icon: Terminal },
+  ]
 
   return (
     <nav className="site-nav">
@@ -25,6 +31,21 @@ const Navbar = ({ user, onLogout }) => {
 
           {/* Desktop Menu */}
           <div className="hidden md:flex items-center space-x-4">
+            <div className="theme-switcher" aria-label="Tema da interface">
+              {themes.map(({ id, label, icon: Icon }) => (
+                <button
+                  key={id}
+                  type="button"
+                  className={`theme-option ${theme === id ? 'active' : ''}`}
+                  onClick={() => onThemeChange(id)}
+                  aria-label={`Usar modo ${label}`}
+                  aria-pressed={theme === id}
+                >
+                  <Icon className="h-3.5 w-3.5" />
+                  <span>{label}</span>
+                </button>
+              ))}
+            </div>
             {user ? (
               <>
                 <NavLink to="/dashboard" className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`}>Visão geral</NavLink>
@@ -61,6 +82,13 @@ const Navbar = ({ user, onLogout }) => {
         {isMenuOpen && (
           <div className="md:hidden">
             <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3">
+              <div className="theme-switcher mb-3 w-fit" aria-label="Tema da interface">
+                {themes.map(({ id, label, icon: Icon }) => (
+                  <button key={id} type="button" className={`theme-option ${theme === id ? 'active' : ''}`} onClick={() => onThemeChange(id)} aria-pressed={theme === id}>
+                    <Icon className="h-3.5 w-3.5" /> <span>{label}</span>
+                  </button>
+                ))}
+              </div>
               {user ? (
                 <>
                   <Link to="/dashboard" className="block">
