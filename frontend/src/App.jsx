@@ -7,6 +7,8 @@ import Register from './pages/Register'
 import Dashboard from './pages/Dashboard'
 import Projects from './pages/Projects'
 import Profile from './pages/Profile'
+import Terms from './pages/Terms'
+import Privacy from './pages/Privacy'
 import './App.css'
 
 function App() {
@@ -85,6 +87,8 @@ function App() {
             path="/register"
             element={user ? <Navigate to="/dashboard" /> : <Register />}
           />
+          <Route path="/termos" element={<Terms />} />
+          <Route path="/privacidade" element={<Privacy />} />
           <Route
             path="/dashboard"
             element={user ? <Dashboard user={user} token={token} /> : <Navigate to="/login" />}

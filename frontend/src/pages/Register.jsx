@@ -216,7 +216,7 @@ const Register = () => {
                   }
                 />
                 <Label htmlFor="aceitarTermos" className="text-sm leading-5 text-[#657066]">
-                  Aceito os termos de uso e a política de privacidade.
+                  Aceito os <Link to="/termos" className="font-semibold text-[#758e38] hover:text-[#18221d]">termos de uso</Link> e a <Link to="/privacidade" className="font-semibold text-[#758e38] hover:text-[#18221d]">política de privacidade</Link>.
                 </Label>
               </div>
 
