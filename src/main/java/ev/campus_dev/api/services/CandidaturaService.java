@@ -37,7 +37,7 @@ public class CandidaturaService {
         if (!"ABERTO".equals(projeto.getStatus())) {
             throw new BusinessException("O projeto não está aberto para candidaturas");
         }
-        if (candidaturaRepository.existsByProjetoId_projetoAndDesenvolvedorId(projetoId, desenvolvedorId)) {
+        if (candidaturaRepository.existsByProjetoIdProjetoAndDesenvolvedorId(projetoId, desenvolvedorId)) {
             throw new BusinessException("Candidatura duplicada");
         }
         Candidatura candidatura = new Candidatura();
@@ -48,7 +48,7 @@ public class CandidaturaService {
     }
 
     public List<Candidatura> listarPorProjeto(Long projetoId) {
-        return candidaturaRepository.findByProjetoId_projeto(projetoId);
+        return candidaturaRepository.findByProjetoIdProjeto(projetoId);
     }
 
     @Transactional

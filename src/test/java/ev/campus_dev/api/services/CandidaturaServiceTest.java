@@ -45,7 +45,7 @@ class CandidaturaServiceTest {
         projeto.setStatus("ABERTO");
         when(projetoRepository.findById(1L)).thenReturn(Optional.of(projeto));
         when(usuarioRepository.findById(2L)).thenReturn(Optional.of(new Usuario()));
-        when(candidaturaRepository.existsByProjetoId_projetoAndDesenvolvedorId(1L, 2L)).thenReturn(true);
+        when(candidaturaRepository.existsByProjetoIdProjetoAndDesenvolvedorId(1L, 2L)).thenReturn(true);
 
         assertThatThrownBy(() -> service().candidatar(1L, 2L))
                 .isInstanceOf(BusinessException.class)
