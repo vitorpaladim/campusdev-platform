@@ -9,7 +9,7 @@ import { Badge } from '@/components/ui/badge'
 import { Alert, AlertDescription } from '@/components/ui/alert'
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import { Plus, Users, Calendar, Code, Search, Filter, AlertCircle, CheckCircle, MessageCircle } from 'lucide-react'
+import { Plus, Users, Calendar, Code, Search, Filter, AlertCircle, CheckCircle, MessageCircle, Eye } from 'lucide-react'
 import { apiFetch } from '@/api/client'
 
 const Projects = ({ user, token }) => {
@@ -25,6 +25,7 @@ const Projects = ({ user, token }) => {
   const [createLoading, setCreateLoading] = useState(false)
   const [createError, setCreateError] = useState('')
   const [chatProject, setChatProject] = useState(null)
+  const [detailProject, setDetailProject] = useState(null)
   const [messages, setMessages] = useState([])
   const [messageText, setMessageText] = useState('')
   const [chatLoading, setChatLoading] = useState(false)
@@ -542,6 +543,9 @@ const Projects = ({ user, token }) => {
                   </div>
 
                   <div className="pt-2">
+                    <Button variant="outline" className="mb-2 w-full" onClick={() => setDetailProject(project)}>
+                      <Eye className="mr-2 h-4 w-4" /> Ver detalhes
+                    </Button>
                     {user && (project.cliente?.id === user.id || project.desenvolvedores?.some((member) => member.id === user.id)) && (
                       <Button variant="outline" className="mb-2 w-full" onClick={() => openChat(project)}>
                         <MessageCircle className="mr-2 h-4 w-4" /> Abrir conversa
@@ -593,6 +597,41 @@ const Projects = ({ user, token }) => {
             <Input value={messageText} onChange={(event) => setMessageText(event.target.value)} maxLength={2000} placeholder="Escreva uma mensagem..." />
             <Button type="submit" disabled={chatLoading || !messageText.trim()}>Enviar</Button>
           </form>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={Boolean(detailProject)} onOpenChange={(open) => !open && setDetailProject(null)}>
+        <DialogContent className="max-w-2xl">
+          <DialogHeader>
+            <DialogTitle>{detailProject?.titulo}</DialogTitle>
+            <DialogDescription>
+              {detailProject?.categoria || 'Projeto colaborativo'} · {detailProject?.status || 'ABERTO'}
+            </DialogDescription>
+          </DialogHeader>
+          {detailProject && (
+            <div className="space-y-6">
+              <p className="whitespace-pre-wrap leading-7 text-gray-600">{detailProject.descricao}</p>
+              <div className="grid gap-3 sm:grid-cols-3">
+                <div className="rounded-xl bg-gray-50 p-4"><p className="text-xs font-semibold uppercase text-gray-500">Equipe</p><p className="mt-1 font-bold">{detailProject.desenvolvedores?.length || 0}/{detailProject.qndPessoasNecessarias || 0}</p></div>
+                <div className="rounded-xl bg-gray-50 p-4"><p className="text-xs font-semibold uppercase text-gray-500">Orçamento</p><p className="mt-1 font-bold">{detailProject.orcamento ? `R$ ${Number(detailProject.orcamento).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}` : 'A combinar'}</p></div>
+                <div className="rounded-xl bg-gray-50 p-4"><p className="text-xs font-semibold uppercase text-gray-500">Prazo</p><p className="mt-1 font-bold">{detailProject.prazoEntrega ? new Date(detailProject.prazoEntrega).toLocaleDateString('pt-BR') : 'A combinar'}</p></div>
+              </div>
+              <div>
+                <p className="text-sm font-bold">Ferramentas e tecnologias</p>
+                <div className="mt-2 flex flex-wrap gap-2">
+                  {(detailProject.linguagemTecnologia || '').split(',').map((tech) => tech.trim()).filter(Boolean).map((tech) => <Badge key={tech} variant="secondary">{tech}</Badge>)}
+                </div>
+              </div>
+              <div className="flex justify-end gap-2">
+                {user && (detailProject.cliente?.id === user.id || detailProject.desenvolvedores?.some((member) => member.id === user.id)) && (
+                  <Button variant="outline" onClick={() => { setDetailProject(null); openChat(detailProject) }}>
+                    <MessageCircle className="mr-2 h-4 w-4" /> Abrir conversa
+                  </Button>
+                )}
+                {canJoinProject(detailProject) && <Button onClick={() => { setDetailProject(null); handleJoinProject(detailProject.idProjeto) }}>Participar</Button>}
+              </div>
+            </div>
+          )}
         </DialogContent>
       </Dialog>
     </div>
