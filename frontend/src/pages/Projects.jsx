@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { useSearchParams } from 'react-router-dom'
+import { Link, useSearchParams } from 'react-router-dom'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
@@ -11,6 +11,7 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, Di
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Plus, Users, Calendar, Code, Search, Filter, AlertCircle, CheckCircle, MessageCircle, Eye } from 'lucide-react'
 import { apiFetch } from '@/api/client'
+import { DEMO_PROJECTS } from '@/lib/demoData'
 
 const Projects = ({ user, token }) => {
   const [searchParams] = useSearchParams()
@@ -61,7 +62,8 @@ const Projects = ({ user, token }) => {
         setError('Erro ao carregar projetos')
       }
     } catch {
-      setError('Erro de conexão')
+      setProjects(DEMO_PROJECTS)
+      setError('Modo demonstração: a API está indisponível, então estes projetos são exemplos locais.')
     } finally {
       setLoading(false)
     }
@@ -193,8 +195,8 @@ const Projects = ({ user, token }) => {
 
   const filteredProjects = projects.filter(project => {
     const technologies = project.linguagemTecnologia || ''
-    const matchesSearch = project.titulo.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         project.descricao.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    const matchesSearch = (project.titulo || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         (project.descricao || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
                          technologies.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          (project.categoria || '').toLowerCase().includes(searchTerm.toLowerCase())
 
@@ -224,13 +226,25 @@ const Projects = ({ user, token }) => {
 
   const canJoinProject = (project) => {
     if (!user) return false
+    if (user.role !== 'DEV' && user.role !== 'DESENVOLVEDOR') return false
+    if (String(project.cliente?.id) === String(user.id)) return false
     if (project.status !== 'ABERTO') return false
+    if ((project.desenvolvedores || []).some((member) => String(member.id) === String(user.id))) return false
+    if ((project.desenvolvedores?.length || 0) >= (project.qndPessoasNecessarias || 0)) return false
     return true
   }
 
-  const isUserInProject = () => {
-    return false
+  const isUserInProject = (project) => {
+    return Boolean(user && project.desenvolvedores?.some((member) => String(member.id) === String(user.id)))
   }
+
+  const statusLabel = (status) => ({
+    ABERTO: 'Aberto',
+    EM_SELECAO: 'Em seleção',
+    EM_ANDAMENTO: 'Em andamento',
+    FINALIZADO: 'Finalizado',
+    CANCELADO: 'Cancelado',
+  }[status] || status || 'Sem status')
 
   const getInitials = (name) => (name || '?')
     .split(' ')
@@ -395,6 +409,7 @@ const Projects = ({ user, token }) => {
         <div className="relative flex-1">
           <Search className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
           <Input
+            aria-label="Buscar projetos por título, descrição, categoria ou tecnologia"
             placeholder="Buscar projetos..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
@@ -410,6 +425,7 @@ const Projects = ({ user, token }) => {
           <SelectContent>
             <SelectItem value="all">Todos os status</SelectItem>
             <SelectItem value="ABERTO">Aberto</SelectItem>
+            <SelectItem value="EM_SELECAO">Em seleção</SelectItem>
             <SelectItem value="EM_ANDAMENTO">Em andamento</SelectItem>
             <SelectItem value="FINALIZADO">Finalizado</SelectItem>
             <SelectItem value="CANCELADO">Cancelado</SelectItem>
@@ -428,6 +444,7 @@ const Projects = ({ user, token }) => {
             </SelectContent>
           </Select>
           <Input
+            aria-label="Filtrar por orçamento máximo"
             type="number"
             min="0"
             step="0.01"
@@ -445,12 +462,23 @@ const Projects = ({ user, token }) => {
       </div>
 
       {/* Projects Grid */}
-      {error ? (
-        <Alert variant="destructive">
+      {error && (
+        <Alert className="mb-5 border-[#d8e4b9] bg-[#f3f8e4] text-[#425523]" role="status">
           <AlertCircle className="h-4 w-4" />
           <AlertDescription>{error}</AlertDescription>
         </Alert>
-      ) : filteredProjects.length === 0 ? (
+      )}
+      <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <p className="text-sm font-semibold text-[#657066]" aria-live="polite">
+          {filteredProjects.length} {filteredProjects.length === 1 ? 'projeto encontrado' : 'projetos encontrados'}
+        </p>
+        {(searchTerm || statusFilter !== 'all' || categoryFilter !== 'all' || maxBudget) && (
+          <Button type="button" variant="ghost" className="w-fit px-0 text-[#758e38] hover:bg-transparent hover:text-[#18221d]" onClick={() => { setSearchTerm(''); setStatusFilter('all'); setCategoryFilter('all'); setMaxBudget('') }}>
+            Limpar todos os filtros
+          </Button>
+        )}
+      </div>
+      {filteredProjects.length === 0 ? (
         <Card>
           <CardContent className="pt-6">
             <div className="text-center text-gray-500">
@@ -472,22 +500,28 @@ const Projects = ({ user, token }) => {
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {filteredProjects.map((project) => (
-            <Card key={project.idProjeto} className="hover:shadow-lg transition-shadow">
+            <Card key={project.idProjeto} className="project-card overflow-hidden border-[#e1e7df] shadow-sm transition hover:-translate-y-1 hover:shadow-xl">
+              <div className="project-banner" style={project.bannerUrl ? { backgroundImage: `url(${project.bannerUrl})` } : undefined} aria-label={`Capa do projeto ${project.titulo}`}>
+                <span className="project-banner-label">{project.destaque ? 'Projeto em destaque' : project.categoria || 'Projeto colaborativo'}</span>
+              </div>
               <CardHeader>
-                <div className="flex items-start justify-between">
+                <div className="flex items-start gap-3">
+                  {project.cliente && <div className="company-logo" title={`Logo de ${project.cliente.nomeEmpresa || project.cliente.nomeCompleto}`}>
+                    {project.cliente.logoUrl ? <img src={project.cliente.logoUrl} alt={`Logo de ${project.cliente.nomeEmpresa || project.cliente.nomeCompleto}`} /> : getInitials(project.cliente.nomeEmpresa || project.cliente.nomeCompleto)}
+                  </div>}
                   <div className="flex-1">
-                    <CardTitle className="text-lg mb-2">{project.titulo}</CardTitle>
-                    {project.destaque && <Badge className="mb-2 bg-[#c8f169] text-[#18221d]">Em destaque</Badge>}
+                    <div className="flex items-start justify-between gap-3"><CardTitle className="text-lg mb-2">{project.titulo}</CardTitle>{project.destaque && <Badge className="shrink-0 bg-[#c8f169] text-[#18221d]">Impulsionado</Badge>}</div>
                     <p className="text-xs font-semibold uppercase tracking-wide text-gray-500">{project.categoria || 'Outros'}</p>
+                    <p className="mt-1 text-xs text-gray-500">Publicado por <span className="font-bold text-[#18221d]">{project.cliente?.nomeEmpresa || project.cliente?.nomeCompleto || 'Pessoa da comunidade'}</span></p>
                     <Badge className={getStatusColor(project.status)}>
-                      {project.status}
+                      {statusLabel(project.status)}
                     </Badge>
                   </div>
                 </div>
                 <CardDescription className="mt-2">
-                  {project.descricao.length > 150
+                  {(project.descricao || '').length > 150
                     ? `${project.descricao.substring(0, 150)}...`
-                    : project.descricao
+                    : project.descricao || 'Este projeto ainda não possui uma descrição.'
                   }
                 </CardDescription>
               </CardHeader>
@@ -502,7 +536,7 @@ const Projects = ({ user, token }) => {
                     ))}
                     {(project.linguagemTecnologia || '').split(',').filter(Boolean).length > 3 && (
                       <Badge variant="secondary" className="text-xs">
-                        +{project.linguagemTecnologia.length - 3}
+                        +{project.linguagemTecnologia.split(',').filter((technology) => technology.trim()).length - 3}
                       </Badge>
                     )}
                   </div>
@@ -532,9 +566,9 @@ const Projects = ({ user, token }) => {
                             </div>
                           )}
                           {(project.desenvolvedores || []).slice(0, 4).map((member) => (
-                            <div key={member.id} className="flex h-8 w-8 items-center justify-center rounded-full border-2 border-white bg-[#dfe5dc] text-[10px] font-bold text-[#18221d]" title={member.nomeCompleto}>
+                            <Link to={`/perfil/${member.id}`} key={member.id} aria-label={`Ver perfil de ${member.nomeCompleto}`} className="flex h-8 w-8 items-center justify-center rounded-full border-2 border-white bg-[#dfe5dc] text-[10px] font-bold text-[#18221d]" title={`Ver perfil de ${member.nomeCompleto}`}>
                               {getInitials(member.nomeCompleto)}
-                            </div>
+                            </Link>
                           ))}
                         </div>
                         <span className="text-xs text-gray-500">
@@ -565,7 +599,7 @@ const Projects = ({ user, token }) => {
                       </Button>
                     ) : (
                       <Button variant="outline" className="w-full" disabled>
-                        {project.status !== 'Em aberto' ? 'Projeto fechado' : 'Equipe completa'}
+                        {project.status !== 'ABERTO' ? 'Projeto fechado' : 'Equipe completa'}
                       </Button>
                     )}
                   </div>

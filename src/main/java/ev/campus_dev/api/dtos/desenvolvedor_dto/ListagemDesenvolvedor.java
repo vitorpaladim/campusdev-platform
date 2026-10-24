@@ -4,18 +4,22 @@ import ev.campus_dev.api.models.desenvolvedor.Desenvolvedor;
 
 public record ListagemDesenvolvedor(
 
-        String id_nomeCompleto,
-        String id_email,
-        String id_bio,
-        String id_disponibilidade,
-        String id_portfolioUrl,
-        String id_curso,
-        String id_skills
+        Long id,
+        String nomeCompleto,
+        String email,
+        String bio,
+        String disponibilidade,
+        String portfolioUrl,
+        String curso,
+        String skills,
+        String avatarUrl,
+        String bannerUrl,
+        String portfolioJson
 
 ) {
     public ListagemDesenvolvedor(Desenvolvedor desenvolvedor) {
-        this(desenvolvedor.getNomeCompleto(), desenvolvedor.getEmail(), desenvolvedor.getBio(),
-                desenvolvedor.getDisponibilidade(), desenvolvedor.getPortfolioUrl(),
-                desenvolvedor.getCurso(), desenvolvedor.getSkills());
+        this(desenvolvedor.getId(), desenvolvedor.getNomeCompleto(), desenvolvedor.getEmail(), desenvolvedor.getBio(),
+                desenvolvedor.getDisponibilidade(), desenvolvedor.getPortfolioUrl(), desenvolvedor.getCurso(),
+                desenvolvedor.getSkills(), desenvolvedor.getAvatarUrl(), desenvolvedor.getBannerUrl(), desenvolvedor.getPortfolioJson());
     }
 }

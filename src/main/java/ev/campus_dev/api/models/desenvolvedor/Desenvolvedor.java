@@ -31,6 +31,8 @@ public class Desenvolvedor extends ev.campus_dev.api.models.usuario.Usuario {
     private String disponibilidade;
     @Column(name = "portfolio_url", length = 500)
     private String portfolioUrl;
+    @Column(name = "portfolio_json", columnDefinition = "TEXT")
+    private String portfolioJson;
     @Column(name = "tipo_perfil")
     private String tipoPerfil;
     @Column(name = "data_cadastro")
@@ -65,6 +67,15 @@ public class Desenvolvedor extends ev.campus_dev.api.models.usuario.Usuario {
         }
         if (dados.skills() != null) {
             this.skills = dados.skills();
+        }
+        if (dados.avatarUrl() != null) {
+            setAvatarUrl(dados.avatarUrl());
+        }
+        if (dados.bannerUrl() != null) {
+            setBannerUrl(dados.bannerUrl());
+        }
+        if (dados.portfolioJson() != null) {
+            this.portfolioJson = dados.portfolioJson();
         }
     }
 }

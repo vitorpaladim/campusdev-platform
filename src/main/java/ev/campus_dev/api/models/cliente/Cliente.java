@@ -22,6 +22,8 @@ public class Cliente extends ev.campus_dev.api.models.usuario.Usuario {
     @Column(name = "nome_empresa")
     private String nomeEmpresa;
     private String telefone;
+    @Column(name = "logo_url", length = 500)
+    private String logoUrl;
     @Column(name = "data_cadastro")
     private LocalDateTime dataDeCadastro;
 
@@ -34,6 +36,9 @@ public class Cliente extends ev.campus_dev.api.models.usuario.Usuario {
         }
         if (dados.telefone() != null) {
             this.telefone = dados.telefone();
+        }
+        if (dados.logoUrl() != null) {
+            this.logoUrl = dados.logoUrl();
         }
     }
 

@@ -32,6 +32,7 @@ public class SecurityConfigurations {
                     req.requestMatchers(HttpMethod.POST, "/api/login").permitAll(); // Permite acesso público ao login
                     req.requestMatchers(HttpMethod.POST, "/api/register").permitAll(); // Permite acesso público ao registro
                     req.requestMatchers(HttpMethod.GET, "/projetos").permitAll(); // Permite que todos vejam os projetos
+                    req.requestMatchers(HttpMethod.GET, "/desenvolvedores/**", "/media/**", "/desenvolvedores/*/recomendacoes").permitAll();
                     req.requestMatchers("/", "/health", "/swagger-ui.html", "/swagger-ui/**", "/v3/api-docs/**").permitAll();
                     req.requestMatchers("/desenvolvedores/**").hasAnyRole("DEV", "DESENVOLVEDOR");
                     req.requestMatchers("/clientes/**").hasRole("CLIENTE");

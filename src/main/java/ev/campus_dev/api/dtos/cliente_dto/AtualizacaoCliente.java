@@ -4,7 +4,7 @@ public record AtualizacaoCliente(
         String nomeCompleto,
         String tipoDeMercado,
         String nomeEmpresa,
-        String telefone
+        String telefone,
+        String logoUrl
 ) {
 }
- 

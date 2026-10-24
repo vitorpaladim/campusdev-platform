@@ -1,289 +1,121 @@
-import { useState, useEffect } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
-import { Plus, Users, Clock, CheckCircle, AlertCircle } from 'lucide-react'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { ArrowUpRight, BriefcaseBusiness, Calendar, CheckCircle, Clock3, Plus, Search, Users, XCircle } from 'lucide-react'
 import { apiFetch } from '@/api/client'
+import { DEMO_PROJECTS } from '@/lib/demoData'
+
+const STATUS_LABELS = {
+  ABERTO: 'Aberto',
+  EM_SELECAO: 'Em seleção',
+  EM_ANDAMENTO: 'Em andamento',
+  FINALIZADO: 'Finalizado',
+  CANCELADO: 'Cancelado',
+}
+
+const STATUS_STYLES = {
+  ABERTO: 'bg-[#eef7d9] text-[#526b25]',
+  EM_SELECAO: 'bg-[#fff4d8] text-[#8a6317]',
+  EM_ANDAMENTO: 'bg-[#e2efff] text-[#245e9c]',
+  FINALIZADO: 'bg-[#edf0ee] text-[#53615a]',
+  CANCELADO: 'bg-[#ffe7e7] text-[#a33d3d]',
+}
+
+const formatDate = (value) => {
+  if (!value) return 'Sem prazo definido'
+  return new Date(value).toLocaleDateString('pt-BR')
+}
+
+const getStatusIcon = (status) => {
+  if (status === 'FINALIZADO') return <CheckCircle className="h-3.5 w-3.5" />
+  if (status === 'CANCELADO') return <XCircle className="h-3.5 w-3.5" />
+  if (status === 'EM_ANDAMENTO') return <BriefcaseBusiness className="h-3.5 w-3.5" />
+  return <Clock3 className="h-3.5 w-3.5" />
+}
+
+const ProjectRow = ({ project }) => (
+  <Link to="/projects" className="group block rounded-2xl border border-[#e5eae3] p-4 transition hover:-translate-y-0.5 hover:border-[#9bad8f] hover:bg-[#fbfcfa]">
+    <div className="flex items-start justify-between gap-4">
+      <div className="min-w-0">
+        <p className="truncate font-black text-[#18221d] group-hover:text-[#758e38]">{project.titulo}</p>
+        <p className="mt-1 line-clamp-2 text-sm leading-6 text-[#657066]">{project.descricao || 'Projeto sem descrição.'}</p>
+      </div>
+      <Badge className={`shrink-0 ${STATUS_STYLES[project.status] || STATUS_STYLES.ABERTO}`}>
+        <span className="mr-1">{getStatusIcon(project.status)}</span>
+        {STATUS_LABELS[project.status] || project.status || 'Aberto'}
+      </Badge>
+    </div>
+    <div className="mt-4 flex flex-wrap items-center gap-x-4 gap-y-2 text-xs font-semibold text-[#758079]">
+      <span className="inline-flex items-center gap-1"><Users className="h-3.5 w-3.5" />{project.desenvolvedores?.length || 0}/{project.qndPessoasNecessarias || 0} pessoas</span>
+      <span className="inline-flex items-center gap-1"><Calendar className="h-3.5 w-3.5" />{formatDate(project.prazoEntrega)}</span>
+      {project.orcamento != null && <span>R$ {Number(project.orcamento).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</span>}
+    </div>
+  </Link>
+)
 
 const Dashboard = ({ user }) => {
-  const [projects, setProjects] = useState({ projetosCriados: [], projetosParticipando: [] })
+  const [projects, setProjects] = useState([])
   const [loading, setLoading] = useState(true)
-  const [error, setError] = useState('')
 
   useEffect(() => {
-    fetchUserProjects()
+    let active = true
+    const fetchProjects = async () => {
+      try {
+        const response = await apiFetch('/projetos')
+        const data = await response.json().catch(() => [])
+        if (!response.ok) throw new Error(data.error || 'Não foi possível carregar os projetos.')
+        if (active) setProjects(Array.isArray(data) ? data : [])
+      } catch {
+        if (active) setProjects(DEMO_PROJECTS)
+      } finally {
+        if (active) setLoading(false)
+      }
+    }
+    fetchProjects()
+    return () => { active = false }
   }, [])
 
-  const fetchUserProjects = async () => {
-    try {
-      const response = await apiFetch('/projetos')
-
-      if (response.ok) {
-        const data = await response.json()
-        setProjects({
-          projetosCriados: [],
-          projetosParticipando: [],
-          projetosDisponiveis: data,
-          estatisticas: { totalCriados: 0, totalParticipando: 0, totalProjetos: data.length },
-        })
-      } else {
-        setError('Erro ao carregar projetos')
-      }
-    } catch {
-      setError('Erro de conexão')
-    } finally {
-      setLoading(false)
-    }
-  }
-
-  const getStatusColor = (status) => {
-    switch (status) {
-      case 'Em aberto':
-        return 'bg-green-100 text-green-800'
-      case 'Em andamento':
-        return 'bg-blue-100 text-blue-800'
-      case 'Finalizado':
-        return 'bg-gray-100 text-gray-800'
-      case 'Cancelado':
-        return 'bg-red-100 text-red-800'
-      default:
-        return 'bg-gray-100 text-gray-800'
-    }
-  }
-
-  const getStatusIcon = (status) => {
-    switch (status) {
-      case 'Em aberto':
-        return <Clock className="h-4 w-4" />
-      case 'Em andamento':
-        return <Users className="h-4 w-4" />
-      case 'Finalizado':
-        return <CheckCircle className="h-4 w-4" />
-      case 'Cancelado':
-        return <AlertCircle className="h-4 w-4" />
-      default:
-        return <Clock className="h-4 w-4" />
-    }
-  }
+  const mine = useMemo(() => projects.filter((project) => String(project.cliente?.id) === String(user?.id)), [projects, user])
+  const participating = useMemo(() => projects.filter((project) => project.desenvolvedores?.some((member) => String(member.id) === String(user?.id))), [projects, user])
+  const openProjects = useMemo(() => projects.filter((project) => project.status === 'ABERTO'), [projects])
+  const recentProjects = useMemo(() => [...projects].sort((a, b) => new Date(b.dataDeCadastro || 0) - new Date(a.dataDeCadastro || 0)).slice(0, 4), [projects])
+  const isClient = user?.role === 'CLIENTE'
 
   if (loading) {
-    return (
-      <div className="container mx-auto px-4 py-8">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-          <p className="text-gray-600">Carregando dashboard...</p>
-        </div>
-      </div>
-    )
+    return <div className="mx-auto max-w-7xl px-6 py-16 text-center"><div className="mx-auto mb-4 h-10 w-10 animate-spin rounded-full border-4 border-[#dfe5dc] border-t-[#758e38]" /><p className="text-[#657066]">Montando sua visão geral...</p></div>
   }
 
   return (
-    <div className="container mx-auto px-4 py-8">
-      {/* Header */}
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-900 mb-2">
-          Bem-vindo, {user.nomeCompleto}!
-        </h1>
-        <p className="text-gray-600">
-          Acompanhe seus projetos, oportunidades e conexões
-        </p>
-      </div>
-
-      {/* Stats Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Projetos Criados</CardTitle>
-            <Plus className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{projects.estatisticas?.totalCriados || 0}</div>
-            <p className="text-xs text-muted-foreground">
-              Projetos que você criou
-            </p>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Participando</CardTitle>
-            <Users className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{projects.estatisticas?.totalParticipando || 0}</div>
-            <p className="text-xs text-muted-foreground">
-              Projetos que você participa
-            </p>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total</CardTitle>
-            <CheckCircle className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">
-              {projects.estatisticas?.totalProjetos || 0}
-            </div>
-            <p className="text-xs text-muted-foreground">
-              Total de projetos envolvidos
-            </p>
-          </CardContent>
-        </Card>
-      </div>
-
-      {/* Quick Actions */}
-      <div className="mb-8">
-        <h2 className="text-xl font-semibold text-gray-900 mb-4">Ações Rápidas</h2>
-        <div className="flex flex-wrap gap-4">
-          <Link to="/projects?action=create">
-            <Button className="flex items-center space-x-2">
-              <Plus className="h-4 w-4" />
-              <span>Criar Projeto</span>
-            </Button>
-          </Link>
-          <Link to="/projects">
-            <Button variant="outline" className="flex items-center space-x-2">
-              <Users className="h-4 w-4" />
-              <span>Explorar Projetos</span>
-            </Button>
-          </Link>
-          <Link to="/profile">
-            <Button variant="outline">Editar Perfil</Button>
-          </Link>
+    <main className="mx-auto max-w-7xl px-6 py-10 lg:px-8 lg:py-14">
+      <section className="soft-panel overflow-hidden p-7 sm:p-10">
+        <div className="flex flex-col gap-8 lg:flex-row lg:items-end lg:justify-between">
+          <div>
+            <p className="eyebrow">Visão geral</p>
+            <h1 className="display-title mt-3 text-4xl sm:text-5xl">Olá, {user?.nomeCompleto?.split(' ')[0] || 'pessoa'}.</h1>
+            <p className="mt-4 max-w-2xl leading-7 text-[#657066]">{isClient ? 'Acompanhe suas demandas e encontre pessoas para tirar suas ideias do papel.' : 'Encontre uma frente em que suas habilidades possam fazer diferença.'}</p>
+          </div>
+          <div className="flex flex-wrap gap-3">
+            {isClient ? <Link to="/projects?action=create"><Button className="rounded-full bg-[#18221d] text-[#c8f169] hover:bg-[#2a3a2f]"><Plus className="mr-2 h-4 w-4" />Publicar projeto</Button></Link> : <Link to="/projects"><Button className="rounded-full bg-[#18221d] text-[#c8f169] hover:bg-[#2a3a2f]"><Search className="mr-2 h-4 w-4" />Explorar oportunidades</Button></Link>}
+            <Link to="/profile"><Button variant="outline" className="rounded-full">Editar perfil</Button></Link>
+          </div>
         </div>
-      </div>
+      </section>
 
-      {/* Projects Sections */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-        {/* Projetos Criados */}
-        <div>
-          <h2 className="text-xl font-semibold text-gray-900 mb-4">
-            Meus Projetos ({projects.projetosCriados?.length || 0})
-          </h2>
-          {!projects.projetosCriados || projects.projetosCriados.length === 0 ? (
-            <Card>
-              <CardContent className="pt-6">
-                <div className="text-center text-gray-500">
-                  <Plus className="h-12 w-12 mx-auto mb-4 text-gray-300" />
-                  <p className="mb-4">Você ainda não criou nenhum projeto</p>
-                  <Link to="/projects?action=create">
-                    <Button>Criar Primeiro Projeto</Button>
-                  </Link>
-                </div>
-              </CardContent>
-            </Card>
-          ) : (
-            <div className="space-y-4">
-              {projects.projetosCriados.slice(0, 3).map((projeto) => (
-                <Card key={projeto.idProjeto} className="hover:shadow-md transition-shadow">
-                  <CardHeader className="pb-3">
-                    <div className="flex items-start justify-between">
-                      <div>
-                        <CardTitle className="text-lg">{projeto.titulo}</CardTitle>
-                        <CardDescription className="mt-1">
-                          {projeto.descricao.substring(0, 100)}...
-                        </CardDescription>
-                      </div>
-                      <Badge className={getStatusColor(projeto.status)}>
-                        <div className="flex items-center space-x-1">
-                          {getStatusIcon(projeto.status)}
-                          <span>{projeto.status}</span>
-                        </div>
-                      </Badge>
-                    </div>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="flex items-center justify-between text-sm text-gray-500">
-                      <span>{projeto.participantes.length}/{projeto.tamanhoEquipe} membros</span>
-                      <span>{new Date(projeto.dataCriacao).toLocaleDateString()}</span>
-                    </div>
-                  </CardContent>
-                </Card>
-              ))}
-              {projects.projetosCriados.length > 3 && (
-                <Link to="/projects?filter=created">
-                  <Button variant="outline" className="w-full">
-                    Ver todos os projetos criados
-                  </Button>
-                </Link>
-              )}
-            </div>
-          )}
-        </div>
+      <section className="mt-6 grid gap-4 sm:grid-cols-3">
+        {[
+          [isClient ? 'Projetos publicados' : 'Projetos participando', isClient ? mine.length : participating.length, isClient ? 'suas demandas na rede' : 'equipes em que você está'],
+          ['Oportunidades abertas', openProjects.length, 'projetos aceitando candidaturas'],
+          ['Projetos na rede', projects.length, 'ideias em movimento'],
+        ].map(([label, value, description]) => <Card key={label} className="border-[#e1e7df] shadow-none"><CardContent className="p-5"><p className="text-sm font-bold text-[#657066]">{label}</p><p className="mt-2 text-3xl font-black text-[#18221d]">{value}</p><p className="mt-1 text-xs text-[#89948d]">{description}</p></CardContent></Card>)}
+      </section>
 
-        {/* Projetos Participando */}
-        <div>
-          <h2 className="text-xl font-semibold text-gray-900 mb-4">
-            Participando ({projects.projetosParticipando?.length || 0})
-          </h2>
-          {!projects.projetosParticipando || projects.projetosParticipando.length === 0 ? (
-            <Card>
-              <CardContent className="pt-6">
-                <div className="text-center text-gray-500">
-                  <Users className="h-12 w-12 mx-auto mb-4 text-gray-300" />
-                  <p className="mb-4">Você ainda não participa de nenhum projeto</p>
-                  <Link to="/projects">
-                    <Button>Explorar Projetos</Button>
-                  </Link>
-                </div>
-              </CardContent>
-            </Card>
-          ) : (
-            <div className="space-y-4">
-              {projects.projetosParticipando.slice(0, 3).map((projeto) => (
-                <Card key={projeto.idProjeto} className="hover:shadow-md transition-shadow">
-                  <CardHeader className="pb-3">
-                    <div className="flex items-start justify-between">
-                      <div>
-                        <CardTitle className="text-lg">{projeto.titulo}</CardTitle>
-                        <CardDescription className="mt-1">
-                          {projeto.descricao.substring(0, 100)}...
-                        </CardDescription>
-                      </div>
-                      <Badge className={getStatusColor(projeto.status)}>
-                        <div className="flex items-center space-x-1">
-                          {getStatusIcon(projeto.status)}
-                          <span>{projeto.status}</span>
-                        </div>
-                      </Badge>
-                    </div>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="flex items-center justify-between text-sm text-gray-500">
-                      <span>{projeto.participantes.length}/{projeto.tamanhoEquipe} membros</span>
-                      <span>{new Date(projeto.dataCriacao).toLocaleDateString()}</span>
-                    </div>
-                  </CardContent>
-                </Card>
-              ))}
-              {projects.projetosParticipando.length > 3 && (
-                <Link to="/projects?filter=participating">
-                  <Button variant="outline" className="w-full">
-                    Ver todos os projetos participando
-                  </Button>
-                </Link>
-              )}
-            </div>
-          )}
-        </div>
-      </div>
-
-      {error && (
-        <div className="mt-8">
-          <Card className="border-red-200">
-            <CardContent className="pt-6">
-              <div className="flex items-center space-x-2 text-red-600">
-                <AlertCircle className="h-5 w-5" />
-                <span>{error}</span>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-      )}
-    </div>
+      <section className="mt-12 grid gap-8 lg:grid-cols-[1.15fr_.85fr]">
+        <Card className="border-[#e1e7df] shadow-none"><CardHeader><div className="flex items-center justify-between gap-4"><div><CardTitle className="text-2xl text-[#18221d]">{isClient ? 'Seus projetos' : 'Onde você está construindo'}</CardTitle><CardDescription className="mt-1">Acompanhe os movimentos mais importantes.</CardDescription></div><Link to="/projects" className="hidden items-center gap-1 text-sm font-bold text-[#758e38] sm:flex">Ver feed <ArrowUpRight className="h-4 w-4" /></Link></div></CardHeader><CardContent className="space-y-3">{(isClient ? mine : participating).slice(0, 4).map((project) => <ProjectRow key={project.idProjeto} project={project} />)}{(isClient ? mine : participating).length === 0 && <div className="rounded-2xl bg-[#f2f5ef] p-6 text-center"><p className="font-bold text-[#18221d]">Ainda não há projetos aqui.</p><p className="mt-2 text-sm leading-6 text-[#657066]">{isClient ? 'Publique uma demanda para começar a formar sua equipe.' : 'Explore o feed e candidate-se a uma oportunidade.'}</p><Link to={isClient ? '/projects?action=create' : '/projects'}><Button className="mt-4 rounded-full">{isClient ? 'Publicar primeiro projeto' : 'Explorar projetos'}</Button></Link></div>}</CardContent></Card>
+        <Card className="border-[#e1e7df] shadow-none"><CardHeader><CardTitle className="text-2xl text-[#18221d]">Mais recentes</CardTitle><CardDescription className="mt-1">Novas oportunidades na comunidade.</CardDescription></CardHeader><CardContent className="space-y-3">{recentProjects.map((project) => <ProjectRow key={project.idProjeto} project={project} />)}{recentProjects.length === 0 && <p className="text-sm text-[#657066]">Nenhum projeto publicado ainda.</p>}</CardContent></Card>
+      </section>
+    </main>
   )
 }
 

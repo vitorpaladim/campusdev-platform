@@ -52,6 +52,7 @@ public class SecurityFilter extends OncePerRequestFilter {
             String token = authorizationHeader.substring("Bearer ".length()).trim();
             return token.isBlank() ? null : token;
         }
-        return null;
+        String queryToken = request.getParameter("token");
+        return queryToken == null || queryToken.isBlank() ? null : queryToken;
     }
 }

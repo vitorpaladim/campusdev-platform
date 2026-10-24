@@ -40,6 +40,10 @@ public class Usuario implements UserDetails {
     @Column(name = "data_cadastro")
     private LocalDateTime dataCadastro;
     private String role;
+    @Column(name = "avatar_url", length = 500)
+    private String avatarUrl;
+    @Column(name = "banner_url", length = 500)
+    private String bannerUrl;
 
 
     public Usuario(CadastroUsuario dadosUsuario) {

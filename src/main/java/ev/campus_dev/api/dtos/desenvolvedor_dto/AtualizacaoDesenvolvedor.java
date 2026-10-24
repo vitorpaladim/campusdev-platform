@@ -10,7 +10,10 @@ public record AtualizacaoDesenvolvedor(
         String portfolioUrl,
         String curso,
         String skills,
-        String semestre
+        String semestre,
+        String avatarUrl,
+        String bannerUrl,
+        String portfolioJson
 
 
 

@@ -5,6 +5,7 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Alert, AlertDescription } from '@/components/ui/alert'
 import { apiFetch } from '@/api/client'
+import { DEMO_USER } from '@/lib/demoData'
 import { ArrowLeft, ArrowUpRight, Code, Lock, Mail, AlertCircle } from 'lucide-react'
 
 const Login = ({ onLogin }) => {
@@ -58,6 +59,14 @@ const Login = ({ onLogin }) => {
     } finally {
       setLoading(false)
     }
+  }
+
+  const enterDemo = () => {
+    const demoToken = 'demo-local-token'
+    localStorage.setItem('token', demoToken)
+    localStorage.setItem('user', JSON.stringify(DEMO_USER))
+    onLogin(DEMO_USER, demoToken)
+    navigate('/dashboard')
   }
 
   return (
@@ -123,6 +132,9 @@ const Login = ({ onLogin }) => {
                 disabled={loading}
               >
                 {loading ? 'Entrando...' : 'Entrar'}
+              </Button>
+              <Button type="button" variant="outline" className="h-12 w-full rounded-full" onClick={enterDemo}>
+                Explorar em modo demonstração
               </Button>
             </form>
             <p className="mt-6 text-center text-xs leading-5 text-[#657066]">
